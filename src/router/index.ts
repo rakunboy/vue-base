@@ -1,23 +1,59 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import LoginView from '@/views/LoginView.vue'
+import DashboardView from '@/views/DashboardView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
+import LayoutDefault from '@/components/layout/LayoutDefault.vue'
+import ProfileView from '@/views/ProfileView.vue'
+import TemplateExampleView from '@/views/TemplateExampleView.vue'
+import LayoutAuth from '@/components/layout/LayoutAuth.vue'
+import PokemonView from '@/views/PokemonView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView,
+      path: '/auth',
+      component: LayoutAuth,
+      meta: { public: true },
+      children: [{ path: '/login', name: 'login', component: LoginView }],
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/',
+      component: LayoutDefault,
+      meta: { requiresAuth: true },
+      children: [
+        { path: '/', name: 'dashboard', component: DashboardView },
+        { path: '/perfil', name: 'perfil', component: ProfileView },
+        { path: '/demo', name: 'demo', component: TemplateExampleView },
+        { path: '/pokemon', name: 'api', component: PokemonView },
+      ],
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notfound',
+      component: NotFoundView,
+      meta: { requiresAuth: false },
     },
   ],
+})
+
+// 🔥 Navigation Guard global
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+
+  if (to.meta.requiresAuth && !token) {
+    // Usuario NO autenticado → redirigir al login
+    next('/login')
+    return
+  }
+
+  if (to.path === '/login' && token) {
+    // Usuario ya autenticado → no dejar entrar al login
+    next('/')
+    return
+  }
+
+  next()
 })
 
 export default router
