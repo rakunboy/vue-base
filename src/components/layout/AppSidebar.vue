@@ -3,12 +3,22 @@
     <h3 class="text-primary fw-bold mb-4">MiApp</h3>
 
     <nav class="nav flex-column">
-      <router-link class="nav-link" to="/">Dashboard</router-link>
+      <div v-for="item in menuStore.sidebarMenu" :key="item.titulo">
+        <router-link class="nav-link" :to="item.route">{{ item.titulo }}</router-link>
+      </div>
+      <!-- <router-link class="nav-link" to="/">Dashboard</router-link>
       <router-link class="nav-link" to="/demo">Demo</router-link>
       <router-link class="nav-link" to="/pokemon">Api</router-link>
+      <router-link class="nav-link" to="/table">Table</router-link> -->
     </nav>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useMenuStore } from '@/stores/menuStore'
+
+const menuStore = useMenuStore()
+</script>
 
 <style scoped>
 .sidebar {

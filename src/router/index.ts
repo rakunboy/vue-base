@@ -7,6 +7,8 @@ import ProfileView from '@/views/ProfileView.vue'
 import TemplateExampleView from '@/views/TemplateExampleView.vue'
 import LayoutAuth from '@/components/layout/LayoutAuth.vue'
 import PokemonView from '@/views/PokemonView.vue'
+import TablesView from '@/views/TablesView.vue'
+import FormView from '@/views/FormView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,6 +28,8 @@ const router = createRouter({
         { path: '/perfil', name: 'perfil', component: ProfileView },
         { path: '/demo', name: 'demo', component: TemplateExampleView },
         { path: '/pokemon', name: 'api', component: PokemonView },
+        { path: '/table', name: 'table', component: TablesView },
+        { path: '/forms', name: 'forms', component: FormView },
       ],
     },
     {

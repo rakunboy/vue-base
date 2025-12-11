@@ -1,0 +1,27 @@
+[
+  {
+    "titulo": "Dashboard",
+    "icon": "home",
+    "route": "/"
+  },
+  {
+    "titulo": "Demo",
+    "icon": "home",
+    "route": "/demo"
+  },
+  {
+    "titulo": "Api",
+    "icon": "home",
+    "route": "/pokemon"
+  },
+  {
+    "titulo": "Table",
+    "icon": "home",
+    "route": "/table"
+  },
+  {
+    "titulo": "Forms",
+    "icon": "home",
+    "route": "/forms"
+  }
+]
