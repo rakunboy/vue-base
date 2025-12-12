@@ -8,10 +8,14 @@ import router from './router'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
+import 'bootstrap-icons/font/bootstrap-icons.css'
+
+import toastPlugin from './plugins/toast-plugin'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(toastPlugin)
 
 app.mount('#app')

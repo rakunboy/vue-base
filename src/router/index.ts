@@ -9,6 +9,8 @@ import LayoutAuth from '@/components/layout/LayoutAuth.vue'
 import PokemonView from '@/views/PokemonView.vue'
 import TablesView from '@/views/TablesView.vue'
 import FormView from '@/views/FormView.vue'
+import ChatView from '@/views/ChatView.vue'
+import BoardView from '@/views/BoardView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,6 +32,8 @@ const router = createRouter({
         { path: '/pokemon', name: 'api', component: PokemonView },
         { path: '/table', name: 'table', component: TablesView },
         { path: '/forms', name: 'forms', component: FormView },
+        { path: '/chat', name: 'chat', component: ChatView },
+        { path: '/board', name: 'board', component: BoardView },
       ],
     },
     {

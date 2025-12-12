@@ -1,4 +1,5 @@
 <template>
+  <!-- <ToastMessage ref="toastRef" /> -->
   <div class="app-layout d-flex">
     <AppSidebar />
 
@@ -13,8 +14,12 @@
 </template>
 
 <script setup lang="ts">
+// import { ref } from 'vue'
 import AppSidebar from './AppSidebar.vue'
 import AppTopbar from './AppTopbar.vue'
+// import ToastMessage from '../common/ToastMessage.vue'
+
+// const toastRef = ref()
 </script>
 
 <style scoped>
@@ -39,6 +44,10 @@ import AppTopbar from './AppTopbar.vue'
   flex-grow: 1;
   width: 100%;
   min-width: 0;
+  overflow-y: auto;
+}
+
+main {
   overflow-y: auto;
 }
 </style>

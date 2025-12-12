@@ -53,9 +53,12 @@
       </table>
     </div>
   </div>
+  <BSAlert type="success" :closable="true"> asdasdas </BSAlert>
 </template>
 
 <script setup lang="ts">
+import BSAlert from '@/components/common/BSAlert.vue'
+
 const demo = [
   { id: 1, name: 'Juan Pérez', email: 'juan@example.com' },
   { id: 2, name: 'Ana López', email: 'ana@example.com' },

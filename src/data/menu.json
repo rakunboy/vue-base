@@ -23,5 +23,15 @@
     "titulo": "Forms",
     "icon": "home",
     "route": "/forms"
+  },
+  {
+    "titulo": "Chat",
+    "icon": "home",
+    "route": "/chat"
+  },
+  {
+    "titulo": "Tablero",
+    "icon": "home",
+    "route": "/board"
   }
 ]

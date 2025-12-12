@@ -1,4 +1,5 @@
 <template>
+  <!-- <ToastMessage ref="toastRef" /> -->
   <div class="p-4 w-100">
     <h2 class="mb-4">Forms</h2>
   </div>
@@ -38,7 +39,7 @@
         v-model="form.pais"
       />
       <FormField id="text17" label="Switch" type="switch" />
-      <FormField
+      <!-- <FormField
         id="value"
         label="País"
         type="multiple"
@@ -47,16 +48,17 @@
           { label: 'España', value: 'ES' },
         ]"
         v-model="form.roles"
-      />
+      /> -->
       <button class="btn btn-primary btn-sm me-2" @click.prevent="send">Enviar</button>
     </form>
   </CardCustom>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import CardCustom from '@/components/common/CardCustom.vue'
 import FormField from '@/components/common/FormField.vue'
-import { ref } from 'vue'
+import { useToast } from '@/plugins/toast-plugin'
 
 const form = ref({
   texto: '',
@@ -75,7 +77,21 @@ const form = ref({
   terms: false,
 })
 
+const toast = useToast()
+
 const send = () => {
+  // const id =
+  toast.showToast({
+    message: 'Guardado exitosamente',
+    variant: 'success',
+    duration: 3000,
+    // actions: [{ label: 'Deshacer', onClick: (t) => console.log(t.id) }],
+  })
+
+  // toast.showToast({
+  //   message: 'Hola desde cualquier lado!',
+  //   variant: 'success',
+  // })
   console.log(form.value)
 }
 </script>
