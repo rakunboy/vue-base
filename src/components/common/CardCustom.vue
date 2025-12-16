@@ -9,8 +9,9 @@
 <style scoped>
 .custom-card {
   background-color: #2a2c34;
-  color: #e3e4e8;
+  color: var(--main-color);
   border: 1px solid #3a3c45;
   border-radius: 12px;
+  min-height: 100%
 }
 </style>

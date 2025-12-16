@@ -69,7 +69,7 @@ defineProps<{
 }
 
 .custom-menu .dropdown-item {
-  color: #e3e4e8;
+  color: var(--main-color);
 }
 
 .custom-menu .dropdown-item:hover {

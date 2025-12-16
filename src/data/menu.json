@@ -1,37 +1,68 @@
 [
   {
     "titulo": "Dashboard",
-    "icon": "home",
+    "icon": "house",
     "route": "/"
   },
   {
     "titulo": "Demo",
-    "icon": "home",
-    "route": "/demo"
+    "icon": "arrow-right-circle-fill",
+    "children": [
+      {
+        "titulo": "Demo",
+        "icon": "arrow-right-circle-fill",
+        "route": "/demo"
+      }
+    ]
   },
   {
     "titulo": "Api",
-    "icon": "home",
+    "icon": "arrow-right-circle-fill",
     "route": "/pokemon"
   },
   {
     "titulo": "Table",
-    "icon": "home",
+    "icon": "arrow-right-circle-fill",
     "route": "/table"
   },
   {
     "titulo": "Forms",
-    "icon": "home",
+    "icon": "arrow-right-circle-fill",
     "route": "/forms"
   },
   {
     "titulo": "Chat",
-    "icon": "home",
+    "icon": "arrow-right-circle-fill",
     "route": "/chat"
   },
   {
     "titulo": "Tablero",
-    "icon": "home",
+    "icon": "arrow-right-circle-fill",
     "route": "/board"
+  },
+  {
+    "titulo": "Calendario",
+    "icon": "arrow-right-circle-fill",
+    "route": "/calendar"
+  },
+  {
+    "titulo": "Modal",
+    "icon": "arrow-right-circle-fill",
+    "route": "/modal"
+  },
+  {
+    "titulo": "Tabs",
+    "icon": "arrow-right-circle-fill",
+    "route": "/tabs"
+  },
+  {
+    "titulo": "Wizard",
+    "icon": "arrow-right-circle-fill",
+    "route": "/wizard"
+  },
+  {
+    "titulo": "Files",
+    "icon": "arrow-right-circle-fill",
+    "route": "/filesystem"
   }
 ]

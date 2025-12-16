@@ -9,13 +9,13 @@
 <style scoped>
 .auth-layout {
   height: 100vh;
-  background-color: #1e1f25;
+  background-color: var(--main-bg-color);
 }
 
 .auth-box {
   width: 380px;
   background: #2a2c34;
   border: 1px solid #3a3c45;
-  color: #e3e4e8;
+  color: var(--main-color);
 }
 </style>

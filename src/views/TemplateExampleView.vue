@@ -54,10 +54,58 @@
     </div>
   </div>
   <BSAlert type="success" :closable="true"> asdasdas </BSAlert>
+  <FloatingActionButton
+    :actions="actions"
+    position="bottom-right"
+    :close-on-action="true"
+  />
 </template>
 
 <script setup lang="ts">
 import BSAlert from '@/components/common/BSAlert.vue'
+import FloatingActionButton, { type FabAction } from '@/components/common/FloatingActionButton.vue'
+import { useToast } from '@/plugins/toast-plugin'
+
+const toast = useToast()
+
+const actions: FabAction[] = [
+  {
+    label: 'Nuevo usuario',
+    icon: 'bi bi-person-plus',
+    onClick: () => {
+      toast.showToast({
+            message: 'Nuevo usuario',
+            variant: 'success',
+            duration: 3000,
+            // actions: [{ label: 'Deshacer', onClick: (t) => console.log(t.id) }],
+          })
+    }
+  },
+  {
+    label: 'Nueva tarea',
+    icon: 'bi bi-check2-square',
+    onClick: () => {
+      toast.showToast({
+            message: 'Nueva tarea',
+            variant: 'success',
+            duration: 3000,
+            // actions: [{ label: 'Deshacer', onClick: (t) => console.log(t.id) }],
+          })
+    }
+  },
+  {
+    label: 'Nuevo mensaje',
+    icon: 'bi bi-chat-dots',
+    onClick: () => {
+      toast.showToast({
+            message: 'Nuevo mensaje',
+            variant: 'success',
+            duration: 3000,
+            // actions: [{ label: 'Deshacer', onClick: (t) => console.log(t.id) }],
+          })
+    }
+  }
+]
 
 const demo = [
   { id: 1, name: 'Juan Pérez', email: 'juan@example.com' },
@@ -69,7 +117,7 @@ const demo = [
 <style scoped>
 .custom-card {
   background-color: #2a2c34;
-  color: #e3e4e8;
+  color: var(--main-color);
   border: 1px solid #3a3c45;
   border-radius: 12px;
 }

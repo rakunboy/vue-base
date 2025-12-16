@@ -4,11 +4,17 @@
 
     <DataGrid :data="demo" title="Tabla de ejemplo">
       <template #submenu>
-        <button class="btn btn-primary btn-sm me-2" @click="add()">Agregar</button>
+        <button class="btn btn-primary btn-sm me-2" @click="add()">
+          <BootstrapIcon icon="plus-circle" size="20" />
+        </button>
       </template>
       <template #actions="{ row }">
-        <button class="btn btn-primary btn-sm me-2" @click="edit(row)">Editar</button>
-        <button class="btn btn-danger btn-sm" @click="deleteRow(row)">Eliminar</button>
+        <button class="btn btn-primary btn-sm me-2" @click="edit(row)">
+          <BootstrapIcon icon="pencil-square" size="20" />
+        </button>
+        <button class="btn btn-danger btn-sm" @click="deleteRow(row)">
+          <BootstrapIcon icon="trash3" size="20" />
+        </button>
       </template>
     </DataGrid>
     <DataGrid :data="demo2" />
@@ -16,8 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import DataGrid from '@/components/common/DataGrid.vue'
-import type { Table, TableData } from '@/types/DataGrid'
+  import DataGrid from '@/components/common/DataGrid.vue'
+  import type { Table, TableData } from '@/types/DataGrid'
+  import BootstrapIcon from '@/components/common/BootstrapIcon.vue'
 
 const demo: Table = {
   fields: [

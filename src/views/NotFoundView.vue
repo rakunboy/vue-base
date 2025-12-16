@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   background: #1f2127;
-  color: #e3e4e8;
+  color: var(--main-color);
   text-align: center;
   padding: 20px;
 }
@@ -62,7 +62,7 @@ p {
 .home-btn {
   display: inline-block;
   padding: 10px 20px;
-  background: #4a90e2;
+  background: var(--bs-primary);
   color: white;
   border-radius: 6px;
   text-decoration: none;

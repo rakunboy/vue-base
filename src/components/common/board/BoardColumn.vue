@@ -2,8 +2,23 @@
   <div class="column p-3 rounded-3">
     <h6 class="fw-bold mb-3">{{ column.title }}</h6>
 
-    <div class="cards-wrapper" @dragover.prevent="dragOver" @drop="drop">
-      <BoardCard v-for="card in column.cards" :key="card.id" :card="card" :column-id="column.id" />
+    <div
+      class="cards-wrapper"
+      ref="wrapper"
+      @dragenter="onDragEnter"
+      @dragleave="onDragLeave"
+      @dragover.prevent="onDragOver"
+      @drop="onDrop"
+    >
+      <template v-for="(card, index) in column.cards" :key="card.id">
+        <!-- Placeholder antes -->
+        <div v-if="isOver && placeholderIndex === index" class="drop-placeholder" />
+
+        <BoardCard :card="card" :column-id="column.id" :index="index" />
+      </template>
+
+      <!-- Placeholder final -->
+      <div v-if="isOver && placeholderIndex === column.cards.length" class="drop-placeholder" />
     </div>
 
     <input
@@ -19,33 +34,112 @@
 import { ref } from 'vue'
 import BoardCard from './BoardCard.vue'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const props = defineProps<{ column: any }>()
-const emit = defineEmits(['move-card', 'add-card'])
+/* ============================
+   Props / Emits
+============================ */
+const props = defineProps<{
+  column: {
+    id: number
+    title: string
+    cards: any[]
+  }
+}>()
 
+const emit = defineEmits<{
+  (
+    e: 'move-card',
+    payload: {
+      fromCol: number
+      toCol: number
+      fromIndex: number
+      toIndex: number
+    },
+  ): void
+  (e: 'add-card', columnId: number, text: string): void
+}>()
+
+/* ============================
+   State
+============================ */
 const newText = ref('')
+const wrapper = ref<HTMLElement | null>(null)
 
+const placeholderIndex = ref<number | null>(null)
+
+/* 🔑 control REAL de hover */
+const isOver = ref(false)
+const dragDepth = ref(0)
+
+/* ============================
+   Add card
+============================ */
 function add() {
   if (!newText.value.trim()) return
   emit('add-card', props.column.id, newText.value)
   newText.value = ''
 }
 
-function dragOver(e: DragEvent) {
-  e.preventDefault()
-  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'
+/* ============================
+   Drag enter / leave (CLAVE)
+============================ */
+function onDragEnter() {
+  dragDepth.value++
+  isOver.value = true
 }
 
-function drop(e: DragEvent) {
-  if (!e.dataTransfer) return
+function onDragLeave() {
+  dragDepth.value--
 
-  const cardId = Number(e.dataTransfer.getData('cardId'))
-  const fromCol = Number(e.dataTransfer.getData('columnId'))
-  const toCol = props.column.id
+  if (dragDepth.value <= 0) {
+    isOver.value = false
+    placeholderIndex.value = null
+    dragDepth.value = 0
+  }
+}
 
-  if (!cardId || !fromCol) return
+/* ============================
+   Drag over
+============================ */
+function onDragOver(e: DragEvent) {
+  if (!wrapper.value || !isOver.value) return
 
-  emit('move-card', cardId, fromCol, toCol)
+  const cards = Array.from(wrapper.value.querySelectorAll('.card-item')) as HTMLElement[]
+
+  /* columna vacía */
+  if (cards.length === 0) {
+    placeholderIndex.value = 0
+    return
+  }
+
+  const mouseY = e.clientY
+
+  let index = cards.findIndex((el) => {
+    const rect = el.getBoundingClientRect()
+    return mouseY < rect.top + rect.height / 2
+  })
+
+  if (index === -1) index = cards.length
+
+  placeholderIndex.value = index
+}
+
+/* ============================
+   Drop
+============================ */
+function onDrop(e: DragEvent) {
+  if (!e.dataTransfer || placeholderIndex.value === null) return
+
+  emit('move-card', {
+    fromCol: Number(e.dataTransfer.getData('fromColumnId')),
+    toCol: props.column.id,
+    fromIndex: Number(e.dataTransfer.getData('fromIndex')),
+    toIndex: placeholderIndex.value,
+  })
+
+  /* reset total */
+  placeholderIndex.value = null
+  isOver.value = false
+  dragDepth.value = 0
 }
 </script>
 
@@ -63,5 +157,12 @@ function drop(e: DragEvent) {
   gap: 10px;
   min-height: 40px;
   padding-bottom: 10px;
+}
+
+.drop-placeholder {
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(13, 110, 253, 0.25);
+  border: 2px dashed #0d6efd;
 }
 </style>

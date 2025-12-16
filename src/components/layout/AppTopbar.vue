@@ -2,7 +2,7 @@
   <header class="topbar d-flex align-items-center justify-content-between px-4 shadow-sm">
     <h5 class="fw-semibold mb-0 d-flex align-items-center gap-2">
       <BootstrapIcon icon="window-sidebar" size="20" />
-      Panel
+      <!-- Panel -->
     </h5>
 
     <div class="d-flex align-items-center gap-3">
@@ -68,7 +68,7 @@ function logout() {
   min-height: 60px;
   background-color: #1f2026;
   border-bottom: 1px solid #2e3038;
-  color: #e3e4e8;
+  color: var(--main-color);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -80,7 +80,7 @@ function logout() {
 
 .custom-menu .dropdown-item,
 .custom-menu .dropdown-item > * {
-  color: #e3e4e8 !important;
+  color: var(--main-color) !important;
 }
 
 .custom-menu .dropdown-item:hover {

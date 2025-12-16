@@ -1,23 +1,27 @@
 <template>
-  <div class="card-item p-3 rounded-3" draggable="true" @dragstart="dragStart">
+  <div class="card-item p-3 rounded-3" draggable="true" @dragstart="dragStart" @dragend="dragEnd">
     {{ card.text }}
   </div>
 </template>
 
 <script setup lang="ts">
 const props = defineProps<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   card: any
   columnId: number
+  index: number
 }>()
 
 function dragStart(e: DragEvent) {
   if (!e.dataTransfer) return
 
-  e.dataTransfer.setData('cardId', String(props.card.id))
-  e.dataTransfer.setData('columnId', String(props.columnId))
-
+  e.dataTransfer.setData('fromColumnId', String(props.columnId))
+  e.dataTransfer.setData('fromIndex', String(props.index))
   e.dataTransfer.effectAllowed = 'move'
+}
+
+function dragEnd() {
+  // Limpieza global de placeholders
+  window.dispatchEvent(new Event('dragend-global'))
 }
 </script>
 
@@ -27,7 +31,7 @@ function dragStart(e: DragEvent) {
   border: 1px solid #474850;
   cursor: grab;
   color: #eee;
-  transition: 0.2s;
+  transition: background 0.15s ease;
 }
 
 .card-item:active {

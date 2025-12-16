@@ -1,5 +1,10 @@
 @import './base.css';
 
+:root {
+  --main-bg-color: #1e1f25;
+  --main-color: #e3e4e8;
+}
+
 /* #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -42,8 +47,8 @@
 }
 
 body {
-  background-color: #1e1f25;
-  color: #e3e4e8;
+  background-color: var(--main-bg-color);
+  color: var(--main-color);
   font-family: 'Inter', sans-serif;
 }
 
@@ -52,15 +57,16 @@ a {
 }
 
 .btn-primary {
-  background-color: #4a90e2;
-  border-color: #4a90e2;
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
 }
 .btn-primary:hover {
-  background-color: lighten(#4a90e2, 5%);
+  background-color: lighten(var(--bs-primary), 5%);
 }
 
-h2 {
-  color: #e3e4e8 !important;
+h2,
+h6 {
+  color: var(--main-color) !important;
 }
 
 .topbar {
@@ -72,4 +78,64 @@ h2 {
   top: 0;
   right: -5px;
   font-size: 0.65rem;
+}
+
+/* CONTENEDOR */
+.fc {
+  --fc-page-bg-color: #121212;
+  --fc-neutral-bg-color: #1e1e1e;
+  --fc-border-color: #2a2a2a;
+
+  --fc-button-bg-color: #212529;
+  --fc-button-border-color: #2a2a2a;
+  --fc-button-text-color: #e9ecef;
+  --fc-button-hover-bg-color: #343a40;
+  --fc-button-hover-border-color: #343a40;
+  --fc-button-active-bg-color: #0d6efd;
+
+  --fc-event-bg-color: #0d6efd;
+  --fc-event-border-color: #0d6efd;
+  --fc-event-text-color: #ffffff;
+
+  --fc-today-bg-color: rgba(13, 110, 253, 0.15);
+}
+
+.fc-theme-standard th,
+.fc-theme-standard td {
+  background-color: #262626;
+  color: #dee2e6;
+}
+.fc-header-toolbar {
+  background-color: #262626;
+  color: #dee2e6;
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: #adb5bd;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.fc .fc-daygrid-day-number {
+  color: #adb5bd;
+  text-decoration: none;
+}
+
+.fc .fc-timegrid-slot-label {
+  color: #adb5bd;
+}
+
+.fc .fc-button {
+  background-color: #212529 !important;
+  border: 1px solid #343a40 !important;
+  color: #f8f9fa !important;
+  text-transform: capitalize;
+}
+
+.fc .fc-button:hover {
+  background-color: #343a40 !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #0d6efd !important;
 }

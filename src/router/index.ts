@@ -11,6 +11,11 @@ import TablesView from '@/views/TablesView.vue'
 import FormView from '@/views/FormView.vue'
 import ChatView from '@/views/ChatView.vue'
 import BoardView from '@/views/BoardView.vue'
+import CalendarView from '@/views/CalendarView.vue'
+import ModalsView from '@/views/ModalsView.vue'
+import TabsView from '@/views/TabsView.vue'
+import WizardView from '@/views/WizardView.vue'
+import FileSystemView from '@/views/FileSystemView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -34,6 +39,11 @@ const router = createRouter({
         { path: '/forms', name: 'forms', component: FormView },
         { path: '/chat', name: 'chat', component: ChatView },
         { path: '/board', name: 'board', component: BoardView },
+        { path: '/calendar', name: 'calendar', component: CalendarView },
+        { path: '/modal', name: 'modal', component: ModalsView },
+        { path: '/tabs', name: 'tabs', component: TabsView },
+        { path: '/wizard', name: 'wizard', component: WizardView },
+        { path: '/filesystem', name: 'filesystem', component: FileSystemView },
       ],
     },
     {

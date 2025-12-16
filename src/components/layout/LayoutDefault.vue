@@ -25,7 +25,7 @@ import AppTopbar from './AppTopbar.vue'
 <style scoped>
 .app-layout {
   height: 100vh;
-  background-color: #1e1f25;
+  background-color: var(--main-bg-color);
 }
 
 .app-layout {
