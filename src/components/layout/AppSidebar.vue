@@ -1,50 +1,43 @@
 <template>
-  <aside :class="sidebarClasses">
-    <!-- Header -->
-    <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
-      <h3 v-if="!isCollapsed && !isMobile" class="text-primary fw-bold mb-0">MiApp</h3>
+  <div>
+    <!-- Sidebar -->
+    <aside :class="sidebarClasses">
+      <!-- Header -->
+      <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+        <h3 class="text-primary fw-bold mb-0">MiApp</h3>
+      </div>
 
-      <!-- Toggle desktop -->
-      <button
-        v-if="!isMobile"
-        class="btn btn-sm btn-outline-secondary ms-auto"
-        @click="toggleCollapse"
-      >
-        <i class="bi bi-layout-sidebar"></i>
-      </button>
+      <!-- Navigation -->
+      <nav class="nav flex-column gap-1 px-2" role="navigation">
+        <SidebarItem
+          v-for="item in menuStore.sidebarMenu"
+          :key="item.titulo"
+          :item="item"
+        />
+      </nav>
+    </aside>
 
-      <!-- Toggle mobile -->
-      <button
-        v-if="isMobile"
-        class="btn btn-sm btn-outline-secondary ms-auto"
-        @click="toggleMobile"
-      >
-        <i class="bi bi-list"></i>
-      </button>
-    </div>
+    <!-- Botón hamburguesa (solo móvil) -->
+    <button
+      v-if="isMobile && !isOpen"
+      class="mobile-hamburger btn btn-primary"
+      @click="toggleMobile"
+      aria-label="Abrir menú"
+    >
+      <i class="bi bi-list"></i>
+    </button>
 
-    <!-- Navigation -->
-    <nav class="nav flex-column gap-1 px-2" role="navigation">
-      <SidebarItem
-        v-for="item in menuStore.sidebarMenu"
-        :key="item.titulo"
-        :item="item"
-        :is-collapsed="isCollapsed"
-        :is-mobile="isMobile"
-      />
-    </nav>
-  </aside>
-
-  <!-- Overlay SOLO en móvil cuando está abierto -->
-  <div
-    v-if="isMobile && isOpen"
-    class="sidebar-overlay"
-    @click="closeMobile"
-  />
+    <!-- Overlay (solo móvil cuando está abierto) -->
+    <div
+      v-if="isMobile && isOpen"
+      class="sidebar-overlay"
+      @click="closeMobile"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useMenuStore } from '@/stores/menuStore'
 import SidebarItem from './SidebarItem.vue'
 
@@ -91,6 +84,9 @@ onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
 })
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
@@ -103,6 +99,7 @@ onMounted(() => {
 
 .sidebar-expanded { width: 240px; }
 .sidebar-collapsed { width: 70px; }
+
 .sidebar-mobile {
   position: fixed;
   top: 0;
@@ -113,15 +110,6 @@ onMounted(() => {
 }
 .sidebar-mobile-open { transform: translateX(0); }
 
-/* Overlay */
-.sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 1030;
-}
-
-/* Header */
 .sidebar-header { border-bottom: 1px solid #3a3c45; }
 
 /* Links */
@@ -137,5 +125,23 @@ onMounted(() => {
 :deep(.router-link-exact-active) {
   background-color: #3a3c45;
   color: #ffffff;
+}
+
+/* Overlay */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1030;
+}
+
+/* Botón hamburguesa móvil */
+.mobile-hamburger {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1050;
+  border-radius: 8px;
+  padding: 6px 10px;
 }
 </style>
