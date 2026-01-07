@@ -1,5 +1,6 @@
 <template>
   <div class="p-4 w-100">
+
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
@@ -12,55 +13,54 @@
       </button>
     </div>
 
+    <!-- FILTER BAR -->
+    <CardCustom class="bg-dark text-light mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Rango de fechas</label>
+          <input type="date" class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Entorno</label>
+          <select class="form-select form-select-sm">
+            <option>Producción</option>
+            <option>QA</option>
+            <option>Desarrollo</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Estado</label>
+          <select class="form-select form-select-sm">
+            <option>Todos</option>
+            <option>Activo</option>
+            <option>Error</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary btn-sm w-100">Aplicar</button>
+        </div>
+      </div>
+    </CardCustom>
+
     <!-- KPIs -->
     <div class="row g-4 mb-4">
-      <div class="col-md-4">
+      <div class="col-md-4" v-for="kpi in kpis" :key="kpi.label">
         <CardCustom class="kpi-card bg-dark text-light">
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <small class="text-secondary">Usuarios</small>
-              <h3 class="fw-bold mb-1">123</h3>
-              <span class="badge bg-success-subtle text-success">+12%</span>
+              <small class="text-secondary">{{ kpi.label }}</small>
+              <h3 class="fw-bold mb-1">{{ kpi.value }}</h3>
+              <span :class="`badge ${kpi.badge}`">{{ kpi.trend }}</span>
             </div>
-            <div class="kpi-icon bg-primary-subtle text-primary">
-              <i class="bi bi-people fs-3"></i>
-            </div>
-          </div>
-        </CardCustom>
-      </div>
-
-      <div class="col-md-4">
-        <CardCustom class="kpi-card bg-dark text-light">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <small class="text-secondary">Ventas</small>
-              <h3 class="fw-bold mb-1">$15,230</h3>
-              <span class="badge bg-success-subtle text-success">↑ 8%</span>
-            </div>
-            <div class="kpi-icon bg-success-subtle text-success">
-              <i class="bi bi-currency-dollar fs-3"></i>
-            </div>
-          </div>
-        </CardCustom>
-      </div>
-
-      <div class="col-md-4">
-        <CardCustom class="kpi-card bg-dark text-light">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <small class="text-secondary">Mensajes</small>
-              <h3 class="fw-bold mb-1">42</h3>
-              <span class="badge bg-warning-subtle text-warning">Pendientes</span>
-            </div>
-            <div class="kpi-icon bg-warning-subtle text-warning">
-              <i class="bi bi-chat-dots fs-3"></i>
+            <div class="kpi-icon" :class="kpi.iconBg">
+              <i :class="`${kpi.icon} fs-3`"></i>
             </div>
           </div>
         </CardCustom>
       </div>
     </div>
 
-    <!-- TODOs + GRÁFICA -->
+    <!-- TODOs + LINE CHART -->
     <div class="row g-4 mb-4">
       <div class="col-lg-4">
         <CardCustom class="bg-dark text-light">
@@ -68,23 +68,10 @@
             <i class="bi bi-exclamation-triangle text-danger me-2"></i>
             TODOs urgentes
           </h5>
-
           <ul class="todo-list">
-            <li class="todo-item high">
-              <span>Responder tickets críticos</span>
-              <span class="badge bg-danger">Alta</span>
-            </li>
-            <li class="todo-item medium">
-              <span>Revisar pagos fallidos</span>
-              <span class="badge bg-warning text-dark">Media</span>
-            </li>
-            <li class="todo-item high">
-              <span>Actualizar permisos</span>
-              <span class="badge bg-danger">Alta</span>
-            </li>
-            <li class="todo-item low">
-              <span>Respaldos semanales</span>
-              <span class="badge bg-secondary">Baja</span>
+            <li v-for="t in todos" :key="t.text" :class="`todo-item ${t.level}`">
+              <span>{{ t.text }}</span>
+              <span class="badge" :class="t.badge">{{ t.priority }}</span>
             </li>
           </ul>
         </CardCustom>
@@ -98,23 +85,55 @@
       </div>
     </div>
 
-    <!-- ACTIVIDAD + ADMIN -->
-    <div class="row g-4">
+    <!-- TABLE + DOUGHNUT -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <CardCustom class="bg-dark text-light">
+          <h5 class="fw-semibold mb-3">Últimos movimientos</h5>
+          <table class="table table-dark table-hover table-sm mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tipo</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(log, i) in logs" :key="i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ log.type }}</td>
+                <td>{{ log.user }}</td>
+                <td>{{ log.time }}</td>
+                <td>
+                  <span class="badge" :class="log.badge">{{ log.status }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </CardCustom>
+      </div>
+
+      <div class="col-lg-4">
+        <CardCustom class="bg-dark text-light">
+          <h5 class="fw-semibold mb-3">Estado del sistema</h5>
+          <Doughnut :data="statusData" />
+        </CardCustom>
+      </div>
+    </div>
+
+    <!-- ACTIVITY + ADMIN -->
+    <div class="row g-4 mb-4">
       <div class="col-lg-6">
         <CardCustom class="bg-dark text-light">
           <h5 class="fw-semibold mb-3">Actividad reciente</h5>
           <ul class="activity-list">
-            <li>
-              <span><i class="bi bi-person-plus text-primary me-2"></i>Nuevo usuario</span>
-              <small>Hace 2 min</small>
-            </li>
-            <li>
-              <span><i class="bi bi-bag-check text-success me-2"></i>Venta completada</span>
-              <small>Hace 10 min</small>
-            </li>
-            <li>
-              <span><i class="bi bi-chat-dots text-warning me-2"></i>Mensaje recibido</span>
-              <small>Hace 1 hora</small>
+            <li v-for="a in activity" :key="a.text">
+              <span>
+                <i :class="`${a.icon} me-2`"></i>{{ a.text }}
+              </span>
+              <small>{{ a.time }}</small>
             </li>
           </ul>
         </CardCustom>
@@ -123,43 +142,45 @@
       <div class="col-lg-6">
         <CardCustom class="bg-dark text-light">
           <h5 class="fw-semibold mb-3">
-            <i class="bi bi-gear me-2"></i>
-            Administración
+            <i class="bi bi-gear me-2"></i> Administración
           </h5>
-
-          <div class="admin-item">
-            <span>Usuarios activos</span>
-            <strong class="text-success">98</strong>
-          </div>
-          <div class="admin-item">
-            <span>Roles pendientes</span>
-            <strong class="text-warning">3</strong>
-          </div>
-          <div class="admin-item">
-            <span>Backups</span>
-            <strong class="text-success">OK</strong>
-          </div>
-          <div class="admin-item">
-            <span>Incidentes</span>
-            <strong class="text-danger">1</strong>
+          <div v-for="a in admin" :key="a.label" class="admin-item">
+            <span>{{ a.label }}</span>
+            <strong :class="a.class">{{ a.value }}</strong>
           </div>
         </CardCustom>
       </div>
     </div>
+
+    <!-- QUICK ACTIONS -->
+    <CardCustom class="bg-dark text-light mb-4">
+      <h5 class="fw-semibold mb-3">Acciones rápidas</h5>
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-person-plus me-1"></i> Usuario
+        </button>
+        <button class="btn btn-outline-success btn-sm">
+          <i class="bi bi-file-earmark-plus me-1"></i> Registro
+        </button>
+        <button class="btn btn-outline-warning btn-sm">
+          <i class="bi bi-shield-lock me-1"></i> Permisos
+        </button>
+      </div>
+    </CardCustom>
+
   </div>
+
+  <!-- FAB -->
   <FloatingActionButton
     :actions="[
       {
         label: 'Nuevo',
         icon: 'bi bi-plus',
-        onClick: () => {
-          toast.showToast({
-            message: 'Guardado exitosamente',
-            variant: 'success',
-            duration: 3000,
-            // actions: [{ label: 'Deshacer', onClick: (t) => console.log(t.id) }],
-          })
-        }
+        onClick: () => toast.showToast({
+          message: 'Acción ejecutada',
+          variant: 'success',
+          duration: 3000
+        })
       }
     ]"
   />
@@ -167,69 +188,75 @@
 
 <script setup lang="ts">
 import CardCustom from '@/components/common/CardCustom.vue'
-import { Line } from 'vue-chartjs'
+import FloatingActionButton from '@/components/common/FloatingActionButton.vue'
+import { Line, Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Tooltip,
   Legend
 } from 'chart.js'
-import FloatingActionButton from '@/components/common/FloatingActionButton.vue'
 import { useToast } from '@/plugins/toast-plugin'
-
-const toast = useToast()
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Tooltip,
   Legend
 )
 
+const toast = useToast()
+
+const kpis = [
+  { label: 'Usuarios', value: 123, trend: '+12%', badge: 'bg-success-subtle text-success', icon: 'bi bi-people', iconBg: 'bg-primary-subtle text-primary' },
+  { label: 'Ventas', value: '$15,230', trend: '↑ 8%', badge: 'bg-success-subtle text-success', icon: 'bi bi-currency-dollar', iconBg: 'bg-success-subtle text-success' },
+  { label: 'Mensajes', value: 42, trend: 'Pendientes', badge: 'bg-warning-subtle text-warning', icon: 'bi bi-chat-dots', iconBg: 'bg-warning-subtle text-warning' }
+]
+
+const todos = [
+  { text: 'Responder tickets críticos', level: 'high', priority: 'Alta', badge: 'bg-danger' },
+  { text: 'Revisar pagos fallidos', level: 'medium', priority: 'Media', badge: 'bg-warning text-dark' },
+  { text: 'Respaldos semanales', level: 'low', priority: 'Baja', badge: 'bg-secondary' }
+]
+
+const logs = [
+  { type: 'Login', user: 'admin', time: 'Hace 5 min', status: 'OK', badge: 'bg-success' },
+  { type: 'Backup', user: 'system', time: 'Hace 20 min', status: 'Proceso', badge: 'bg-warning' }
+]
+
+const activity = [
+  { text: 'Nuevo usuario', icon: 'bi bi-person-plus text-primary', time: '2 min' },
+  { text: 'Venta completada', icon: 'bi bi-bag-check text-success', time: '10 min' }
+]
+
+const admin = [
+  { label: 'Usuarios activos', value: '98', class: 'text-success' },
+  { label: 'Incidentes', value: '1', class: 'text-danger' }
+]
+
 const chartData = {
   labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-  datasets: [
-    {
-      label: 'Ventas',
-      data: [1200, 1900, 1500, 2200, 1800, 2500, 2100],
-      borderColor: '#0d6efd',
-      backgroundColor: 'rgba(13,110,253,0.2)',
-      tension: 0.4
-    }
-  ]
+  datasets: [{ label: 'Ventas', data: [1200, 1900, 1500, 2200, 1800, 2500, 2100], borderColor: '#0d6efd', tension: 0.4 }]
 }
 
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: { labels: { color: '#f8f9fa' } }
-  },
-  scales: {
-    x: {
-      ticks: { color: '#adb5bd' },
-      grid: { color: 'rgba(255,255,255,0.05)' }
-    },
-    y: {
-      ticks: { color: '#adb5bd' },
-      grid: { color: 'rgba(255,255,255,0.05)' }
-    }
-  }
+const statusData = {
+  labels: ['OK', 'Advertencias', 'Errores'],
+  datasets: [{ data: [12, 3, 1], backgroundColor: ['#198754', '#ffc107', '#dc3545'] }]
 }
+
+const chartOptions = { responsive: true }
 </script>
 
 <style scoped>
-.kpi-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.kpi-card:hover {
-  transform: translateY(-4px);
-}
-
+.kpi-card { transition: transform 0.2s ease; }
+.kpi-card:hover { transform: translateY(-4px); }
 .kpi-icon {
   width: 56px;
   height: 56px;
@@ -238,41 +265,17 @@ const chartOptions = {
   align-items: center;
   justify-content: center;
 }
-
 .todo-list,
-.activity-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+.activity-list { list-style: none; padding: 0; margin: 0; }
 .todo-item,
 .activity-list li,
 .admin-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 0.6rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-
-.todo-item:last-child,
-.activity-list li:last-child,
-.admin-item:last-child {
-  border-bottom: none;
-}
-
-.todo-item.high {
-  color: #f8d7da;
-}
-.todo-item.medium {
-  color: #fff3cd;
-}
-.todo-item.low {
-  color: #ced4da;
-}
-
-.activity-list small {
-  color: #adb5bd;
-}
+.todo-item.high { color: #f8d7da; }
+.todo-item.medium { color: #fff3cd; }
+.todo-item.low { color: #ced4da; }
 </style>

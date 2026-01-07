@@ -16,6 +16,7 @@ import ModalsView from '@/views/ModalsView.vue'
 import TabsView from '@/views/TabsView.vue'
 import WizardView from '@/views/WizardView.vue'
 import FileSystemView from '@/views/FileSystemView.vue'
+import ApiTablesView from '@/views/ApiTablesView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -44,6 +45,7 @@ const router = createRouter({
         { path: '/tabs', name: 'tabs', component: TabsView },
         { path: '/wizard', name: 'wizard', component: WizardView },
         { path: '/filesystem', name: 'filesystem', component: FileSystemView },
+        { path: '/table-rest', name: 'table-rest', component: ApiTablesView },
       ],
     },
     {

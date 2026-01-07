@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import apiPoke from '@/services/api'
 import type { PokemonFull } from '@/types/pokemon'
 
 export const usePokeStore = defineStore('poke', {
@@ -15,7 +15,7 @@ export const usePokeStore = defineStore('poke', {
       this.error = null
 
       try {
-        const res = await api.get<PokemonFull>(`/pokemon/${id}`)
+        const res = await apiPoke.get<PokemonFull>(`/pokemon/${id}`)
         this.pokemon = res.data
       } catch (err: unknown) {
         console.log(err)

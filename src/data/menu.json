@@ -26,6 +26,11 @@
     "route": "/table"
   },
   {
+    "titulo": "Api Table",
+    "icon": "arrow-right-circle-fill",
+    "route": "/table-rest"
+  },
+  {
     "titulo": "Forms",
     "icon": "arrow-right-circle-fill",
     "route": "/forms"

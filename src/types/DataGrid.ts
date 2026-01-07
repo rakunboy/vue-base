@@ -1,5 +1,5 @@
 export interface TableData {
-  id: number | string
+  id: number | string | null
   [key: string]: unknown
 }
 

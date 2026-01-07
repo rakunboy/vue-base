@@ -15,7 +15,9 @@
         aria-live="polite"
       >
         <div class="toast-main d-flex align-items-start">
-          <div v-if="toast.icon" class="toast-icon me-2" v-html="toast.icon"></div>
+          <div v-if="toast.icon" class="" style="padding-right: 18px;">
+            <bootstrap-icon size="20" :icon="toast.icon" />
+          </div>
 
           <div class="toast-body flex-grow-1">
             <div v-if="toast.title" class="toast-title">{{ toast.title }}</div>
@@ -58,6 +60,7 @@
 
 <script setup lang="ts">
 import { reactive, /*readonly,*/ computed, onBeforeUnmount } from 'vue'
+import BootstrapIcon from './BootstrapIcon.vue'
 
 // ----- Types -----
 export type ToastVariant = 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'
