@@ -17,6 +17,7 @@ import TabsView from '@/views/TabsView.vue'
 import WizardView from '@/views/WizardView.vue'
 import FileSystemView from '@/views/FileSystemView.vue'
 import ApiTablesView from '@/views/ApiTablesView.vue'
+// import { useAuthStore } from '@/stores/authStore'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -59,7 +60,9 @@ const router = createRouter({
 
 // 🔥 Navigation Guard global
 router.beforeEach((to, from, next) => {
+  // const authStore = useAuthStore()
   const token = localStorage.getItem('token')
+  // const token = authStore.isAuthenticated
 
   if (to.meta.requiresAuth && !token) {
     // Usuario NO autenticado → redirigir al login

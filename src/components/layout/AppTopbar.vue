@@ -54,12 +54,27 @@
 import { useRouter } from 'vue-router'
 import BootstrapIcon from '../common/BootstrapIcon.vue'
 import DropDown from '../common/DropDown.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { useToast } from '@/plugins/toast-plugin'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const toast = useToast();
 
-function logout() {
-  localStorage.removeItem('token')
-  router.push('/login')
+async function logout() {
+  const res = await authStore.logout()
+
+  toast.showToast({
+      message: res.message,
+      variant: res.success ? 'success' : 'warning',
+      icon: 'success',
+      duration: 5000
+    })
+
+  if(res.success){
+    localStorage.removeItem('token')
+    router.push('/login')
+  }
 }
 </script>
 

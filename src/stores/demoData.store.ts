@@ -16,13 +16,12 @@ export const useDemoDataStore = defineStore('demo', {
   state: () => ({
     items: [] as DemoRow[],
     loading: false,
-    error: null as string | null,
   }),
 
   actions: {
     async fetch(): Promise<ActionResult<DemoRow>> {
       this.loading = true
-      await new Promise((r) => setTimeout(r, 2000))
+      // await new Promise((r) => setTimeout(r, 2000))
       try {
         const res = await api.get('demouuid')
         this.items = res.data.data

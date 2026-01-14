@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import apiPoke from '@/services/api'
+// import apiPoke from '@/services/api'
 import type { PokemonFull } from '@/types/pokemon'
+import { apiPoke } from '@/services/api'
 
 export const usePokeStore = defineStore('poke', {
   state: () => ({

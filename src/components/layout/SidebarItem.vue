@@ -36,8 +36,8 @@
           v-for="child in props.item.children"
           :key="child.titulo"
           :item="child"
-          :is-collapsed="props.isCollapsed"
-          :is-mobile="props.isMobile"
+          :is-collapsed="props.isCollapsed ?? false"
+          :is-mobile="props.isMobile ?? false"
         />
       </div>
     </transition>

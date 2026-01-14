@@ -26,16 +26,30 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from '@/plugins/toast-plugin';
+import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const user = ref('')
-const pass = ref('')
+const authStore = useAuthStore();
+const toast = useToast();
+const user = ref('admin@admin.com')
+const pass = ref('password')
 
-function login() {
-  if (user.value && pass.value) {
-    localStorage.setItem('token', 'demo')
+async function login() {
+  if (!user.value || !pass.value) return
+
+  const res = await authStore.login(user.value, pass.value)
+
+  toast.showToast({
+    message: res.message,
+    variant: res.success ? 'success' : 'warning',
+    icon: res.success ? 'success' : 'warning',
+    duration: 5000,
+  })
+
+  if (res.success) {
     router.push('/')
   }
 }

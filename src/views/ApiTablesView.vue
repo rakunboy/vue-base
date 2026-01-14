@@ -15,7 +15,7 @@
         <button class="btn btn-primary btn-sm me-2" @click="openForm(row)">
           <BootstrapIcon icon="pencil-square" size="20" />
         </button>
-        <button class="btn btn-danger btn-sm" @click="deleteRow(row)">
+        <button class="btn btn-danger btn-sm" @click="openConfirm(row)">
           <BootstrapIcon icon="trash3" size="20" />
         </button>
       </template>
@@ -24,14 +24,6 @@
     <div v-if="store.loading" class="text-center py-5">
       <div class="spinner-border text-primary"></div>
       <p class="mt-3">Cargando...</p>
-    </div>
-
-    <!-- Error -->
-    <div
-      v-if="store.error"
-      class="alert alert-danger bg-danger text-light border border-danger mt-3"
-    >
-      {{ store.error }}
     </div>
 
     <DataCards :data="demo">
@@ -69,6 +61,21 @@
         </button>
         <button class="btn btn-success" @click="saveData">
           Guardar
+        </button>
+      </template>
+    </ModalBase>
+
+    <ModalBase ref="confirmModal">
+      <template #title>Confirmar acción</template>
+
+      <p>¿Estás seguro de continuar?</p>
+
+      <template #footer>
+        <button class="btn btn-secondary" @click="closeConfirm">
+          Cancelar
+        </button>
+        <button class="btn btn-danger" @click="confirmAction">
+          Confirmar
         </button>
       </template>
     </ModalBase>
@@ -161,5 +168,24 @@ async function saveData(){
     duration: 5000
   })
   closeForm()
+}
+
+const confirmModal = ref<InstanceType<typeof ModalBase> | null>(null)
+const deleteSelected = ref<DemoRow | null>(null)
+
+function openConfirm(row: DemoRow) {
+  deleteSelected.value = row
+  confirmModal.value?.open()
+}
+
+function closeConfirm() {
+  confirmModal.value?.close()
+}
+
+function confirmAction() {
+  if(deleteSelected.value)
+    deleteRow(deleteSelected.value)
+  console.log('Acción confirmada')
+  closeConfirm()
 }
 </script>
