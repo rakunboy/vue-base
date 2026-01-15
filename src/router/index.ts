@@ -17,7 +17,8 @@ import TabsView from '@/views/TabsView.vue'
 import WizardView from '@/views/WizardView.vue'
 import FileSystemView from '@/views/FileSystemView.vue'
 import ApiTablesView from '@/views/ApiTablesView.vue'
-// import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore } from '@/stores/authStore'
+import UsersView from '@/views/UsersView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -47,6 +48,7 @@ const router = createRouter({
         { path: '/wizard', name: 'wizard', component: WizardView },
         { path: '/filesystem', name: 'filesystem', component: FileSystemView },
         { path: '/table-rest', name: 'table-rest', component: ApiTablesView },
+        { path: '/administracion/usuarios', name: 'adminitracion-usuarios', component: UsersView },
       ],
     },
     {
@@ -59,24 +61,60 @@ const router = createRouter({
 })
 
 // 🔥 Navigation Guard global
-router.beforeEach((to, from, next) => {
-  // const authStore = useAuthStore()
-  const token = localStorage.getItem('token')
-  // const token = authStore.isAuthenticated
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !token) {
-    // Usuario NO autenticado → redirigir al login
-    next('/login')
-    return
+  // 🔹 Bootstrap (una sola vez)
+  if (!authStore.token) {
+    const storedToken = localStorage.getItem('token')
+
+    if (storedToken) {
+      authStore.token = storedToken
+      try {
+        await authStore.me()
+      } catch {
+        authStore.token = null
+      }
+    }
   }
 
-  if (to.path === '/login' && token) {
-    // Usuario ya autenticado → no dejar entrar al login
-    next('/')
-    return
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+
+  // const isPublic = to.matched.some((record) => record.meta.public)
+
+  const isAuthenticated = authStore.isAuthenticated
+
+  // 🔐 Ruta protegida
+  if (requiresAuth && !isAuthenticated) {
+    return next('/login')
+  }
+
+  // 🚫 Login si ya está logueado
+  if (to.path === '/login' && isAuthenticated) {
+    return next('/')
   }
 
   next()
 })
+
+// router.beforeEach((to, from, next) => {
+//   // const authStore = useAuthStore()
+//   const token = localStorage.getItem('token')
+//   // const token = authStore.isAuthenticated
+
+//   if (to.meta.requiresAuth && !token) {
+//     // Usuario NO autenticado → redirigir al login
+//     next('/login')
+//     return
+//   }
+
+//   if (to.path === '/login' && token) {
+//     // Usuario ya autenticado → no dejar entrar al login
+//     next('/')
+//     return
+//   }
+
+//   next()
+// })
 
 export default router

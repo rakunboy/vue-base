@@ -11,6 +11,9 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import toastPlugin from './plugins/toast-plugin'
+import { loadToken } from './services/api'
+
+loadToken()
 
 const app = createApp(App)
 

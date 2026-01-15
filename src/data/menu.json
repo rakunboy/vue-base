@@ -5,6 +5,17 @@
     "route": "/"
   },
   {
+    "titulo": "Administración",
+    "icon": "arrow-right-circle-fill",
+    "children": [
+      {
+        "titulo": "Usuarios",
+        "icon": "arrow-right-circle-fill",
+        "route": "/administracion/usuarios"
+      }
+    ]
+  },
+  {
     "titulo": "Demo",
     "icon": "arrow-right-circle-fill",
     "children": [
