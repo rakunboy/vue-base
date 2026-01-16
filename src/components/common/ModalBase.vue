@@ -45,6 +45,13 @@ const props = defineProps<{
   size?: 'sm' | 'lg' | 'xl'
 }>()
 
+const emit = defineEmits<{
+  (e: 'open'): void
+  (e: 'opened'): void
+  (e: 'close'): void
+  (e: 'closed'): void
+}>()
+
 const modalRef = ref<HTMLElement | null>(null)
 // let modalInstance: Modal | null = null
 let modalInstance: InstanceType<typeof Modal> | null = null
@@ -57,9 +64,28 @@ const sizeClass = computed(() => {
 })
 
 onMounted(() => {
-  if (modalRef.value) {
-    modalInstance = new Modal(modalRef.value)
-  }
+  // if (modalRef.value) {
+  //   modalInstance = new Modal(modalRef.value)
+  // }
+  if (!modalRef.value) return
+
+  modalInstance = new Modal(modalRef.value)
+
+  modalRef.value.addEventListener('show.bs.modal', () => {
+    emit('open')
+  })
+
+  modalRef.value.addEventListener('shown.bs.modal', () => {
+    emit('opened')
+  })
+
+  modalRef.value.addEventListener('hide.bs.modal', () => {
+    emit('close')
+  })
+
+  modalRef.value.addEventListener('hidden.bs.modal', () => {
+    emit('closed')
+  })
 })
 
 onBeforeUnmount(() => {

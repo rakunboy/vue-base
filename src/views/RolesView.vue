@@ -1,8 +1,8 @@
 <template>
   <div class="p-4 w-100">
-    <h2 class="mb-4">Usuarios</h2>
+    <h2 class="mb-4">Roles</h2>
 
-    <DataGrid :data="usersTable" title="Administración de usuarios" :loading="store.loading">
+    <DataGrid :data="rolesTable" title="Administración de roles" :loading="store.loadingData">
       <template #submenu>
         <button class="btn btn-primary btn-sm me-2" @click="loadData()" :disabled="store.loading">
           <BootstrapIcon icon="arrow-clockwise" size="20" />
@@ -12,53 +12,48 @@
         </button>
       </template>
       <template #actions="{ row }">
-        <button class="btn btn-primary btn-sm me-2" @click="openForm(row as UserRow)">
+        <button class="btn btn-primary btn-sm me-2" @click="openConfig(row as RoleRow)">
+          <BootstrapIcon icon="gear-fill" size="20" />
+        </button>
+        <button class="btn btn-primary btn-sm me-2" @click="openForm(row as RoleRow)">
           <BootstrapIcon icon="pencil-square" size="20" />
         </button>
-        <button class="btn btn-danger btn-sm" @click="openConfirm(row as UserRow)">
+        <button class="btn btn-danger btn-sm" @click="openConfirm(row as RoleRow)">
           <BootstrapIcon icon="trash3" size="20" />
         </button>
       </template>
     </DataGrid>
 
-    <DataCards v-if="false" :data="usersTable">
+    <DataCards v-if="false" :data="rolesTable">
       <template #submenu>
         <button class="btn btn-primary btn-sm me-2" @click="loadData()">
           <BootstrapIcon icon="arrow-clockwise" size="20" />
         </button>
-        <button class="btn btn-primary btn-sm me-2" @click="add()">
+        <button class="btn btn-primary btn-sm me-2" @click="openForm()">
           <BootstrapIcon icon="plus-circle" size="20" />
         </button>
       </template>
       <template #actions="{ row }">
-        <button class="btn btn-primary btn-sm me-2" @click="edit(row)">
-            <BootstrapIcon icon="pencil-square" size="20" />
-          </button>
-          <button class="btn btn-danger btn-sm" @click="deleteRow(row)">
-            <BootstrapIcon icon="trash3" size="20" />
-          </button>
+        <button class="btn btn-primary btn-sm me-2" @click="openForm(row as RoleRow)">
+          <BootstrapIcon icon="pencil-square" size="20" />
+        </button>
+        <button class="btn btn-danger btn-sm" @click="openConfirm(row as RoleRow)">
+          <BootstrapIcon icon="trash3" size="20" />
+        </button>
       </template>
     </DataCards>
   </div>
   <ModalBase ref="formModal" size="lg" @closed="onCloseForm">
-      <template #title>{{formData.id ? 'Modificar' : 'Nuevo'}} usuario</template>
+      <template #title>{{formData.id ? 'Modificar' : 'Nuevo'}} rol</template>
 
       <form class="row g-3">
         <div class="col-md-12">
           <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" v-model="formData.name" />
+          <input type="text" class="form-control" @blur="rolNameBlur" v-model="formData.name" />
         </div>
         <div class="col-md-12">
-          <label class="form-label">Correo</label>
-          <input type="text" class="form-control" v-model="formData.email" />
-        </div>
-        <div class="col-md-12">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" v-model="formData.password" />
-        </div>
-        <div class="col-md-12">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" v-model="formData.password_confirmation" />
+          <label class="form-label">Llave</label>
+          <input type="text" class="form-control" v-model="formData.key" />
         </div>
       </form>
 
@@ -76,7 +71,7 @@
       <template #title>Confirmar acción</template>
 
       <p>
-        ¿Estás seguro de eliminar al usuario
+        ¿Estás seguro de eliminar al rol
         <strong>{{ deleteSelected?.name }}</strong>?
       </p>
 
@@ -89,6 +84,11 @@
         </button>
       </template>
     </ModalBase>
+
+    <ModalBase ref="permissionsModal" size="xl">
+      <template #title>Configuración: {{ configSelected?.name }}</template>
+      <PermisosGrid :roleID="configSelected?.id?.toString()" />
+    </ModalBase>
 </template>
 
 <script setup lang="ts">
@@ -99,20 +99,21 @@ import DataCards from '@/components/common/DataCards.vue'
 import { computed, onMounted, ref } from 'vue'
 import ModalBase from '@/components/common/ModalBase.vue'
 import { useToast } from '@/plugins/toast-plugin'
-import { useUserStore, type UserRow } from '@/stores/usersStore'
+import { useRoleStore, type RoleRow } from '@/stores/rolesStore'
+import PermisosGrid from './Components/PermisosGrid.vue'
 
-const store = useUserStore()
+const store = useRoleStore()
 const toast = useToast();
 
 onMounted(() => {
   loadData()
 })
 
-const usersTable = computed<Table>(() => ({
+const rolesTable = computed<Table>(() => ({
   fields: [
     // { name: 'id', label: 'ID' },
-    { name: 'name', label: 'Name' },
-    { name: 'email', label: 'Email' },
+    { name: 'name', label: 'Nombre' },
+    { name: 'key', label: 'Llave' },
   ],
   data: store.items,
 }))
@@ -126,14 +127,7 @@ const loadData = async () => {
     duration: 5000
   })
 }
-const add = () => store.add({
-  id: 0,
-  name: 'asdasd',
-  email: 'asdasd',
-})
-const edit = (row: TableData) => {
-  console.log('editar', row)
-}
+
 const deleteRow = async (row: TableData) => {
   if(row.id){
     const res = await store.remove(row.id?.toString())
@@ -146,32 +140,27 @@ const deleteRow = async (row: TableData) => {
 }
 
 const formModal = ref<InstanceType<typeof ModalBase> | null>(null)
-const formData = ref<UserRow>({
+const formData = ref<RoleRow>({
   id: null,
-  name: 'nuevo',
-  email: '',
-  password: '',
-  password_confirmation: '',
+  name: '',
+  key: '',
 })
 
-function openForm(row?: UserRow) {
-  clearUserForm()
+function openForm(row?: RoleRow) {
+  clearRoleForm()
   if(row){
-    // formData.value.id = row.id
-    // formData.value.name = row.name
-    // formData.value.email = row.email
     formData.value = {
       ...formData.value,
       id: row.id,
       name: row.name,
-      email: row.email,
+      key: row.key,
     }
   }
   formModal.value?.open()
 }
 
 function closeForm() {
-  clearUserForm()
+  clearRoleForm()
   formModal.value?.close()
 }
 
@@ -191,9 +180,9 @@ async function saveData(){
 }
 
 const confirmModal = ref<InstanceType<typeof ModalBase> | null>(null)
-const deleteSelected = ref<UserRow | null>(null)
+const deleteSelected = ref<RoleRow | null>(null)
 
-function openConfirm(row: UserRow) {
+function openConfirm(row: RoleRow) {
   deleteSelected.value = row
   confirmModal.value?.open()
 }
@@ -205,19 +194,32 @@ function closeConfirm() {
 function confirmAction() {
   if(deleteSelected.value)
     deleteRow(deleteSelected.value)
-  console.log('Acción confirmada')
   closeConfirm()
 }
 
-const onCloseForm = () => clearUserForm()
+const onCloseForm = () => clearRoleForm()
 
-const clearUserForm = () => {
+const clearRoleForm = () => {
   formData.value = {
     id: null,
     name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    key: ''
   }
+}
+
+const rolNameBlur = () => {
+  if(!formData.value.id)
+    formData.value.key = formData.value.name.toUpperCase().split(' ').join('_')
+}
+
+const permissionsModal = ref<InstanceType<typeof ModalBase> | null>(null)
+const configSelected = ref<RoleRow | null>(null)
+
+function openConfig(row: RoleRow) {
+  configSelected.value = row
+  if(row){
+    // const id = row.id;
+  }
+  permissionsModal.value?.open()
 }
 </script>

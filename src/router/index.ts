@@ -19,6 +19,8 @@ import FileSystemView from '@/views/FileSystemView.vue'
 import ApiTablesView from '@/views/ApiTablesView.vue'
 import { useAuthStore } from '@/stores/authStore'
 import UsersView from '@/views/UsersView.vue'
+import RolesView from '@/views/RolesView.vue'
+import PermisosView from '@/views/PermisosView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -49,6 +51,12 @@ const router = createRouter({
         { path: '/filesystem', name: 'filesystem', component: FileSystemView },
         { path: '/table-rest', name: 'table-rest', component: ApiTablesView },
         { path: '/administracion/usuarios', name: 'adminitracion-usuarios', component: UsersView },
+        { path: '/administracion/roles', name: 'adminitracion-roles', component: RolesView },
+        {
+          path: '/administracion/permisos',
+          name: 'adminitracion-permisos',
+          component: PermisosView,
+        },
       ],
     },
     {

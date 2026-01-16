@@ -4,28 +4,40 @@ import api from '@/services/api'
 import type { ActionResult } from '@/types/ActionResult'
 import { handleAxiosException } from '@/utils/handleExceptions'
 
-export interface UserRow extends TableData {
-  name: string
-  email: string
+export interface GetPermisoRow extends TableData {
+  name?: string
+  key?: string
+  role_id?: string | null
 }
 
-export type UserCreateDto = Omit<UserRow, 'id'>
-export type UserUpdateDto = Partial<UserCreateDto>
+export interface PermisoRow extends TableData {
+  name: string
+  key: string
+  role_id?: string | null
+}
 
-const BASE_URL = 'user'
+export type PermisoCreateDto = Omit<PermisoRow, 'id'>
+export type PermisoUpdateDto = Partial<PermisoCreateDto>
 
-export const useUserStore = defineStore('users', {
+const BASE_URL = 'permisos'
+
+export const usePermisoStore = defineStore('permisos', {
   state: () => ({
-    items: [] as UserRow[],
+    items: [] as PermisoRow[],
+    loadingData: false,
     loading: false,
   }),
 
   actions: {
-    async fetch(): Promise<ActionResult<UserRow>> {
-      this.loading = true
+    async fetch(data?: GetPermisoRow): Promise<ActionResult<PermisoRow>> {
+      this.loadingData = true
       // await new Promise((r) => setTimeout(r, 2000))
       try {
-        const res = await api.get(BASE_URL)
+        const res = await api.get(BASE_URL, {
+          params: {
+            role_id: data?.role_id,
+          },
+        })
         this.items = res.data.data
         return {
           success: true,
@@ -36,11 +48,11 @@ export const useUserStore = defineStore('users', {
         this.items = []
         return handleAxiosException(error)
       } finally {
-        this.loading = false
+        this.loadingData = false
       }
     },
 
-    async add(payload: UserCreateDto): Promise<ActionResult<UserRow>> {
+    async add(payload: PermisoCreateDto): Promise<ActionResult<PermisoRow>> {
       this.loading = true
       try {
         const res = await api.post(BASE_URL, {
@@ -60,7 +72,7 @@ export const useUserStore = defineStore('users', {
       }
     },
 
-    async update(id: string, payload: UserUpdateDto): Promise<ActionResult<UserRow>> {
+    async update(id: string, payload: PermisoUpdateDto): Promise<ActionResult<PermisoRow>> {
       this.loading = true
       try {
         const res = await api.put(`${BASE_URL}/${id}`, {
@@ -90,7 +102,7 @@ export const useUserStore = defineStore('users', {
       }
     },
 
-    async remove(id: string): Promise<ActionResult<UserRow>> {
+    async remove(id: string): Promise<ActionResult<PermisoRow>> {
       this.loading = true
       try {
         await api.delete(`${BASE_URL}/${id}`)

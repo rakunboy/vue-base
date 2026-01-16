@@ -12,6 +12,16 @@
         "titulo": "Usuarios",
         "icon": "arrow-right-circle-fill",
         "route": "/administracion/usuarios"
+      },
+      {
+        "titulo": "Roles",
+        "icon": "arrow-right-circle-fill",
+        "route": "/administracion/roles"
+      },
+      {
+        "titulo": "Permisos",
+        "icon": "arrow-right-circle-fill",
+        "route": "/administracion/permisos"
       }
     ]
   },

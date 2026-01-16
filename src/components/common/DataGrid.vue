@@ -9,7 +9,11 @@
       <slot name="submenu"></slot>
     </div>
 
-    <table class="table table-dark table-hover align-middle">
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="mt-3">Cargando...</p>
+    </div>
+    <table v-else class="table table-dark table-hover align-middle">
       <thead>
         <tr>
           <th
@@ -27,7 +31,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="row in props.data.data" :key="row.id">
+        <tr v-for="(row, index) in props.data.data" :key="row.id ?? index">
           <td v-for="field in props.data.fields" :key="field.name">
             <!-- 1) Si hay formatter lo usamos -->
             <span v-if="field.formatter">
@@ -56,7 +60,8 @@ import CardCustom from './CardCustom.vue'
 
 const props = defineProps<{
   data: Table
-  title?: string
+  title?: string,
+  loading: boolean
 }>()
 </script>
 

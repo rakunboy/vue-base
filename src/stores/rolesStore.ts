@@ -4,25 +4,26 @@ import api from '@/services/api'
 import type { ActionResult } from '@/types/ActionResult'
 import { handleAxiosException } from '@/utils/handleExceptions'
 
-export interface UserRow extends TableData {
+export interface RoleRow extends TableData {
   name: string
-  email: string
+  key: string
 }
 
-export type UserCreateDto = Omit<UserRow, 'id'>
-export type UserUpdateDto = Partial<UserCreateDto>
+export type RoleCreateDto = Omit<RoleRow, 'id'>
+export type RoleUpdateDto = Partial<RoleCreateDto>
 
-const BASE_URL = 'user'
+const BASE_URL = 'roles'
 
-export const useUserStore = defineStore('users', {
+export const useRoleStore = defineStore('roles', {
   state: () => ({
-    items: [] as UserRow[],
+    items: [] as RoleRow[],
+    loadingData: false,
     loading: false,
   }),
 
   actions: {
-    async fetch(): Promise<ActionResult<UserRow>> {
-      this.loading = true
+    async fetch(): Promise<ActionResult<RoleRow>> {
+      this.loadingData = true
       // await new Promise((r) => setTimeout(r, 2000))
       try {
         const res = await api.get(BASE_URL)
@@ -36,11 +37,11 @@ export const useUserStore = defineStore('users', {
         this.items = []
         return handleAxiosException(error)
       } finally {
-        this.loading = false
+        this.loadingData = false
       }
     },
 
-    async add(payload: UserCreateDto): Promise<ActionResult<UserRow>> {
+    async add(payload: RoleCreateDto): Promise<ActionResult<RoleRow>> {
       this.loading = true
       try {
         const res = await api.post(BASE_URL, {
@@ -60,7 +61,7 @@ export const useUserStore = defineStore('users', {
       }
     },
 
-    async update(id: string, payload: UserUpdateDto): Promise<ActionResult<UserRow>> {
+    async update(id: string, payload: RoleUpdateDto): Promise<ActionResult<RoleRow>> {
       this.loading = true
       try {
         const res = await api.put(`${BASE_URL}/${id}`, {
@@ -90,7 +91,7 @@ export const useUserStore = defineStore('users', {
       }
     },
 
-    async remove(id: string): Promise<ActionResult<UserRow>> {
+    async remove(id: string): Promise<ActionResult<RoleRow>> {
       this.loading = true
       try {
         await api.delete(`${BASE_URL}/${id}`)
