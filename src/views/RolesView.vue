@@ -4,23 +4,54 @@
 
     <DataGrid :data="rolesTable" title="Administración de roles" :loading="store.loadingData">
       <template #submenu>
-        <button class="btn btn-primary btn-sm me-2" @click="loadData()" :disabled="store.loading">
+        <CustomButton
+          class="me-2"
+          icon="arrow-clockwise"
+          @click="loadData()"
+          :disabled="store.loadingData"
+        />
+        <CustomButton
+          class="me-2"
+          icon="plus-circle"
+          @click="openForm()"
+          :disabled="store.loading"
+        />
+        <!-- <button class="btn btn-primary btn-sm me-2" @click="loadData()" :disabled="store.loadingData">
           <BootstrapIcon icon="arrow-clockwise" size="20" />
-        </button>
-        <button class="btn btn-primary btn-sm me-2" @click="openForm()">
+        </button> -->
+        <!-- <button class="btn btn-primary btn-sm me-2" @click="openForm()">
           <BootstrapIcon icon="plus-circle" size="20" />
-        </button>
+        </button> -->
       </template>
       <template #actions="{ row }">
-        <button class="btn btn-primary btn-sm me-2" @click="openConfig(row as RoleRow)">
+        <CustomButton
+          class="me-2"
+          icon="gear-fill"
+          @click="openConfig(row as RoleRow)"
+          :disabled="store.loading"
+        />
+        <CustomButton
+          class="me-2"
+          icon="pencil-square"
+          @click="openForm(row as RoleRow)"
+          :disabled="store.loading"
+        />
+        <CustomButton
+          class="me-2"
+          icon="trash3"
+          variant="danger"
+          @click="openConfirm(row as RoleRow)"
+          :disabled="store.loading"
+        />
+        <!-- <button class="btn btn-primary btn-sm me-2" @click="openConfig(row as RoleRow)">
           <BootstrapIcon icon="gear-fill" size="20" />
-        </button>
-        <button class="btn btn-primary btn-sm me-2" @click="openForm(row as RoleRow)">
+        </button> -->
+        <!-- <button class="btn btn-primary btn-sm me-2" @click="openForm(row as RoleRow)">
           <BootstrapIcon icon="pencil-square" size="20" />
-        </button>
-        <button class="btn btn-danger btn-sm" @click="openConfirm(row as RoleRow)">
+        </button> -->
+        <!-- <button class="btn btn-danger btn-sm" @click="openConfirm(row as RoleRow)">
           <BootstrapIcon icon="trash3" size="20" />
-        </button>
+        </button> -->
       </template>
     </DataGrid>
 
@@ -87,7 +118,7 @@
 
     <ModalBase ref="permissionsModal" size="xl">
       <template #title>Configuración: {{ configSelected?.name }}</template>
-      <PermisosGrid :roleID="configSelected?.id?.toString()" />
+      <PermisosGrid ref="permisosGridRef" :roleID="configSelected?.id?.toString()" />
     </ModalBase>
 </template>
 
@@ -101,6 +132,8 @@ import ModalBase from '@/components/common/ModalBase.vue'
 import { useToast } from '@/plugins/toast-plugin'
 import { useRoleStore, type RoleRow } from '@/stores/rolesStore'
 import PermisosGrid from './Components/PermisosGrid.vue'
+import CustomButton from '@/components/common/CustomButton.vue'
+
 
 const store = useRoleStore()
 const toast = useToast();
@@ -214,12 +247,15 @@ const rolNameBlur = () => {
 
 const permissionsModal = ref<InstanceType<typeof ModalBase> | null>(null)
 const configSelected = ref<RoleRow | null>(null)
+const permisosGridRef = ref<InstanceType<typeof PermisosGrid> | null>(null)
 
 function openConfig(row: RoleRow) {
   configSelected.value = row
   if(row){
     // const id = row.id;
   }
+  permisosGridRef.value?.loadData(row.id?.toString())
+
   permissionsModal.value?.open()
 }
 </script>

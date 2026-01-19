@@ -59,10 +59,10 @@ const handleResize = () => {
 }
 
 /* ---------- Desktop ---------- */
-const toggleCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
-  localStorage.setItem(STORAGE_KEY, String(isCollapsed.value))
-}
+// const toggleCollapse = () => {
+//   isCollapsed.value = !isCollapsed.value
+//   localStorage.setItem(STORAGE_KEY, String(isCollapsed.value))
+// }
 
 /* ---------- Mobile ---------- */
 const toggleMobile = () => {
@@ -143,5 +143,9 @@ onUnmounted(() => {
   z-index: 1050;
   border-radius: 8px;
   padding: 6px 10px;
+}
+
+.sidebar-overflow {
+  overflow-y: auto;
 }
 </style>

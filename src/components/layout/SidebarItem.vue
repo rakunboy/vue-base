@@ -50,8 +50,8 @@ import BootstrapIcon from '../common/BootstrapIcon.vue'
 
 const props = defineProps<{
   item: any
-  isCollapsed: boolean
-  isMobile: boolean
+  isCollapsed?: boolean
+  isMobile?: boolean
 }>()
 
 const isOpen = ref(false)

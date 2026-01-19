@@ -2,7 +2,10 @@
   <div class="p-4 w-100">
 
     <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div
+      ref="headerRef"
+      class="d-flex justify-content-between align-items-center mb-4"
+    >
       <div>
         <h2 class="fw-bold mb-1">Dashboard</h2>
         <p class="text-secondary mb-0">Panel administrativo general</p>
@@ -14,7 +17,7 @@
     </div>
 
     <!-- FILTER BAR -->
-    <CardCustom class="bg-dark text-light mb-4">
+    <CardCustom ref="filterRef" class="bg-dark text-light mb-4">
       <div class="row g-3 align-items-end">
         <div class="col-md-4">
           <label class="form-label">Rango de fechas</label>
@@ -44,7 +47,12 @@
 
     <!-- KPIs -->
     <div class="row g-4 mb-4">
-      <div class="col-md-4" v-for="kpi in kpis" :key="kpi.label">
+      <div
+        class="col-md-4"
+        v-for="kpi in kpis"
+        :key="kpi.label"
+        ref="kpiRefs"
+      >
         <CardCustom class="kpi-card bg-dark text-light">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -60,8 +68,8 @@
       </div>
     </div>
 
-    <!-- TODOs + LINE CHART -->
-    <div class="row g-4 mb-4">
+    <!-- TODO + CHART -->
+    <div class="row g-4 mb-4 gsap-section">
       <div class="col-lg-4">
         <CardCustom class="bg-dark text-light">
           <h5 class="fw-semibold mb-3">
@@ -69,7 +77,11 @@
             TODOs urgentes
           </h5>
           <ul class="todo-list">
-            <li v-for="t in todos" :key="t.text" :class="`todo-item ${t.level}`">
+            <li
+              v-for="t in todos"
+              :key="t.text"
+              :class="`todo-item ${t.level}`"
+            >
               <span>{{ t.text }}</span>
               <span class="badge" :class="t.badge">{{ t.priority }}</span>
             </li>
@@ -86,7 +98,7 @@
     </div>
 
     <!-- TABLE + DOUGHNUT -->
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-4 gsap-section">
       <div class="col-lg-8">
         <CardCustom class="bg-dark text-light">
           <h5 class="fw-semibold mb-3">Últimos movimientos</h5>
@@ -124,7 +136,7 @@
     </div>
 
     <!-- ACTIVITY + ADMIN -->
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-4 gsap-section">
       <div class="col-lg-6">
         <CardCustom class="bg-dark text-light">
           <h5 class="fw-semibold mb-3">Actividad reciente</h5>
@@ -144,7 +156,11 @@
           <h5 class="fw-semibold mb-3">
             <i class="bi bi-gear me-2"></i> Administración
           </h5>
-          <div v-for="a in admin" :key="a.label" class="admin-item">
+          <div
+            v-for="a in admin"
+            :key="a.label"
+            class="admin-item"
+          >
             <span>{{ a.label }}</span>
             <strong :class="a.class">{{ a.value }}</strong>
           </div>
@@ -153,7 +169,7 @@
     </div>
 
     <!-- QUICK ACTIONS -->
-    <CardCustom class="bg-dark text-light mb-4">
+    <CardCustom class="bg-dark text-light mb-4 gsap-section">
       <h5 class="fw-semibold mb-3">Acciones rápidas</h5>
       <div class="d-flex gap-2 flex-wrap">
         <button class="btn btn-outline-primary btn-sm">
@@ -172,6 +188,7 @@
 
   <!-- FAB -->
   <FloatingActionButton
+    ref="fabRef"
     :actions="[
       {
         label: 'Nuevo',
@@ -187,6 +204,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import gsap from 'gsap'
 import CardCustom from '@/components/common/CardCustom.vue'
 import FloatingActionButton from '@/components/common/FloatingActionButton.vue'
 import { Line, Doughnut } from 'vue-chartjs'
@@ -214,6 +233,29 @@ ChartJS.register(
 
 const toast = useToast()
 
+/* GSAP refs */
+const headerRef = ref<HTMLElement | null>(null)
+const filterRef = ref<HTMLElement | null>(null)
+const kpiRefs = ref<HTMLElement[]>([])
+const fabRef = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  const tl = gsap.timeline({
+    defaults: { duration: 0.6, ease: 'power2.out' }
+  })
+
+  tl.from(headerRef.value, { y: -20, opacity: 0 })
+    .from(filterRef.value, { y: 20, opacity: 0 }, '-=0.3')
+    .from(kpiRefs.value, { y: 30, opacity: 0, stagger: 0.15 }, '-=0.2')
+    .from('.gsap-section', { y: 40, opacity: 0, stagger: 0.2 }, '-=0.1')
+    .from(
+      fabRef.value,
+      { scale: 0, opacity: 0, ease: 'back.out(1.7)' },
+      '-=0.2'
+    )
+})
+
+/* DATA */
 const kpis = [
   { label: 'Usuarios', value: 123, trend: '+12%', badge: 'bg-success-subtle text-success', icon: 'bi bi-people', iconBg: 'bg-primary-subtle text-primary' },
   { label: 'Ventas', value: '$15,230', trend: '↑ 8%', badge: 'bg-success-subtle text-success', icon: 'bi bi-currency-dollar', iconBg: 'bg-success-subtle text-success' },
@@ -243,12 +285,24 @@ const admin = [
 
 const chartData = {
   labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-  datasets: [{ label: 'Ventas', data: [1200, 1900, 1500, 2200, 1800, 2500, 2100], borderColor: '#0d6efd', tension: 0.4 }]
+  datasets: [
+    {
+      label: 'Ventas',
+      data: [1200, 1900, 1500, 2200, 1800, 2500, 2100],
+      borderColor: '#0d6efd',
+      tension: 0.4
+    }
+  ]
 }
 
 const statusData = {
   labels: ['OK', 'Advertencias', 'Errores'],
-  datasets: [{ data: [12, 3, 1], backgroundColor: ['#198754', '#ffc107', '#dc3545'] }]
+  datasets: [
+    {
+      data: [12, 3, 1],
+      backgroundColor: ['#198754', '#ffc107', '#dc3545']
+    }
+  ]
 }
 
 const chartOptions = { responsive: true }
@@ -257,6 +311,7 @@ const chartOptions = { responsive: true }
 <style scoped>
 .kpi-card { transition: transform 0.2s ease; }
 .kpi-card:hover { transform: translateY(-4px); }
+
 .kpi-icon {
   width: 56px;
   height: 56px;
@@ -265,8 +320,14 @@ const chartOptions = { responsive: true }
   align-items: center;
   justify-content: center;
 }
+
 .todo-list,
-.activity-list { list-style: none; padding: 0; margin: 0; }
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .todo-item,
 .activity-list li,
 .admin-item {
@@ -275,6 +336,7 @@ const chartOptions = { responsive: true }
   padding: 0.6rem 0;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
+
 .todo-item.high { color: #f8d7da; }
 .todo-item.medium { color: #fff3cd; }
 .todo-item.low { color: #ced4da; }

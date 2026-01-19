@@ -9,8 +9,8 @@
       </button>
     </template>
     <template #actions="{ row }">
-      <button v-if="props.roleID" class="btn btn-primary btn-sm me-2" @click="openForm(row as PermisoRow)">
-        <BootstrapIcon icon="plus" size="20" />
+      <button v-if="props.roleID" class="btn btn-primary btn-sm me-2" @click="assignRemoveRole(row as PermisoRow)" :disabled="store.loadingPermission">
+        <BootstrapIcon :icon="(row.has_permission_role == '' ? 'plus' : 'dash') + '-circle-fill'" size="20" />
       </button>
       <button class="btn btn-primary btn-sm me-2" @click="openForm(row as PermisoRow)">
         <BootstrapIcon icon="pencil-square" size="20" />
@@ -93,9 +93,9 @@ const permisosTable = computed<Table>(() => ({
   data: store.items,
 }))
 
-const loadData = async () => {
+const loadData = async (roleID: string | null = null) => {
   const res = await store.fetch({
-    role_id: props.roleID,
+    role_id: roleID ?? props.roleID,
     id: null
   })
 
@@ -123,7 +123,8 @@ const formData = ref<PermisoRow>({
   id: null,
   name: '',
   key: '',
-  role_id: null
+  role_id: null,
+  has_permission_role: false,
 })
 
 function openForm(row?: PermisoRow) {
@@ -183,7 +184,8 @@ const clearPermisoForm = () => {
   formData.value = {
     id: null,
     name: '',
-    key: ''
+    key: '',
+    has_permission_role: false
   }
 }
 
@@ -191,5 +193,19 @@ const rolNameBlur = () => {
   if(!formData.value.id)
     formData.value.key = formData.value.name.toUpperCase().split(' ').join('_')
 }
+
+const assignRemoveRole = (row: PermisoRow) => {
+  if(props.roleID && row.id){
+    if(!row.has_permission_role){
+      store.addPermission(props.roleID, row.id?.toString())
+    } else {
+      store.removePermission(props.roleID, row.id?.toString())
+    }
+  }
+}
+
+defineExpose({
+  loadData
+})
 
 </script>

@@ -14,6 +14,7 @@ export interface PermisoRow extends TableData {
   name: string
   key: string
   role_id?: string | null
+  has_permission_role: boolean
 }
 
 export type PermisoCreateDto = Omit<PermisoRow, 'id'>
@@ -26,6 +27,7 @@ export const usePermisoStore = defineStore('permisos', {
     items: [] as PermisoRow[],
     loadingData: false,
     loading: false,
+    loadingPermission: false,
   }),
 
   actions: {
@@ -117,6 +119,69 @@ export const usePermisoStore = defineStore('permisos', {
         return handleAxiosException(error)
       } finally {
         this.loading = false
+      }
+    },
+    async addPermission(role_id: string, permission_id: string): Promise<ActionResult> {
+      this.loadingPermission = true
+      try {
+        await new Promise((r) => setTimeout(r, 2000))
+        await api.post('roles/permission/assign', {
+          role_id,
+          permission_id,
+        })
+
+        const index = this.items.findIndex((i) => i.id === permission_id)
+        if (index === -1 || !this.items[index]) {
+          return {
+            success: false,
+            message: 'No se encontro el registro solicitado',
+          }
+        }
+
+        // this.items[index] = {
+        //   ...this.items[index],
+        //   ...res.data.data,
+        // }
+        this.items[index].has_permission_role = true
+
+        return {
+          success: true,
+          message: 'Permiso añadido correctamente',
+        }
+      } catch (error: unknown) {
+        return handleAxiosException(error)
+      } finally {
+        this.loadingPermission = false
+      }
+    },
+    async removePermission(role_id: string, permission_id: string): Promise<ActionResult> {
+      this.loadingPermission = true
+      try {
+        await api.delete('roles/permission/remove', {
+          data: {
+            role_id,
+            permission_id,
+          },
+        })
+
+        const index = this.items.findIndex((i) => i.id === permission_id)
+        if (index === -1 || !this.items[index]) {
+          return {
+            success: false,
+            message: 'No se encontro el registro solicitado',
+          }
+        }
+
+        this.items[index].has_permission_role = false
+
+        return {
+          success: true,
+          message: 'Permiso añadido correctamente',
+        }
+      } catch (error: unknown) {
+        return handleAxiosException(error)
+      } finally {
+        this.loadingPermission = false
       }
     },
   },
