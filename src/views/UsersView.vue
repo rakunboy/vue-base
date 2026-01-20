@@ -4,20 +4,38 @@
 
     <DataGrid :data="usersTable" title="Administración de usuarios" :loading="store.loading">
       <template #submenu>
-        <button class="btn btn-primary btn-sm me-2" @click="loadData()" :disabled="store.loading">
-          <BootstrapIcon icon="arrow-clockwise" size="20" />
-        </button>
-        <button class="btn btn-primary btn-sm me-2" @click="openForm()">
-          <BootstrapIcon icon="plus-circle" size="20" />
-        </button>
+        <CustomButton
+          class="me-2"
+          icon="arrow-clockwise"
+          @click="loadData()"
+          :disabled="store.loading"
+        />
+        <CustomButton
+          class="me-2"
+          icon="plus-circle"
+          @click="openForm()"
+        />
       </template>
       <template #actions="{ row }">
-        <button class="btn btn-primary btn-sm me-2" @click="openForm(row as UserRow)">
-          <BootstrapIcon icon="pencil-square" size="20" />
-        </button>
-        <button class="btn btn-danger btn-sm" @click="openConfirm(row as UserRow)">
-          <BootstrapIcon icon="trash3" size="20" />
-        </button>
+        <CustomButton
+          class="me-2"
+          icon="gear-fill"
+          @click="openConfig(row as UserRow)"
+          :disabled="store.loading"
+        />
+        <CustomButton
+          class="me-2"
+          icon="pencil-square"
+          @click="openForm(row as UserRow)"
+          :disabled="store.loading"
+        />
+        <CustomButton
+          class="me-2"
+          icon="trash3"
+          variant="danger"
+          @click="openConfirm(row as UserRow)"
+          :disabled="store.loading"
+        />
       </template>
     </DataGrid>
 
@@ -89,6 +107,13 @@
         </button>
       </template>
     </ModalBase>
+
+    <ModalBase ref="roleModal" size="xl">
+      <!-- <template #title>Configuración: </template> -->
+      <template #title>Configuración: {{ configSelected?.name }}</template>
+      <!-- <PermisosGrid ref="permisosGridRef" :roleID="configSelected?.id?.toString()" /> -->
+      <RolesGrid ref="rolesGridRef" :userID="configSelected?.id?.toString()" :loadOnMounted="false" />
+    </ModalBase>
 </template>
 
 <script setup lang="ts">
@@ -100,6 +125,8 @@ import { computed, onMounted, ref } from 'vue'
 import ModalBase from '@/components/common/ModalBase.vue'
 import { useToast } from '@/plugins/toast-plugin'
 import { useUserStore, type UserRow } from '@/stores/usersStore'
+import CustomButton from '@/components/common/CustomButton.vue'
+import RolesGrid from './Components/RolesGrid.vue'
 
 const store = useUserStore()
 const toast = useToast();
@@ -219,5 +246,19 @@ const clearUserForm = () => {
     password: '',
     password_confirmation: '',
   }
+}
+
+const roleModal = ref<InstanceType<typeof ModalBase> | null>(null)
+const configSelected = ref<UserRow | null>(null)
+const rolesGridRef = ref<InstanceType<typeof RolesGrid> | null>(null)
+
+function openConfig(row: UserRow) {
+  configSelected.value = row
+  if(row){
+  //   // const id = row.id;
+  }
+  rolesGridRef.value?.loadData(row.id?.toString())
+
+  roleModal.value?.open()
 }
 </script>

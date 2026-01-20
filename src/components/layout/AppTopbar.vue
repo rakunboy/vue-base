@@ -31,7 +31,7 @@
       </DropDown>
 
       <!-- Usuario -->
-      <DropDown image="https://i.pravatar.cc/40">
+      <DropDown :image="authStore.user?.image">
         <li>
           <router-link class="dropdown-item py-2" to="/perfil">
             <i class="bi bi-person me-2"></i> Perfil

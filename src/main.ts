@@ -11,9 +11,12 @@ import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import toastPlugin from './plugins/toast-plugin'
-import { loadToken } from './services/api'
+import api, { loadToken } from './services/api'
+import { setupAxiosInterceptors } from './plugins/axios'
 
 loadToken()
+
+setupAxiosInterceptors(api)
 
 const app = createApp(App)
 

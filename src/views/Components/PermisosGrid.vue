@@ -74,14 +74,17 @@ import { useToast } from '@/plugins/toast-plugin'
 import { usePermisoStore, type PermisoRow } from '@/stores/permisosStore'
 
 const props = defineProps<{
-  roleID?: string
+  roleID?: string,
+  loadOnMounted?: boolean,
 }>()
 
 const store = usePermisoStore()
 const toast = useToast();
 
 onMounted(() => {
-  loadData()
+  if(props.loadOnMounted ?? true){
+    loadData()
+  }
 })
 
 const permisosTable = computed<Table>(() => ({

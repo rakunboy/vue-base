@@ -13,6 +13,7 @@ export interface User {
   email: string
   roles: string[]
   permissions: string[]
+  image: string
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -27,6 +28,16 @@ export const useAuthStore = defineStore('auth', {
     hasRole: (state) => (role: string) => state.user?.roles.includes(role) ?? false,
     hasPermission: (state) => (permission: string) =>
       state.user?.permissions.includes(permission) ?? false,
+    userInitials: (state) => {
+      if (!state.user?.name) return ''
+
+      return state.user.name
+        .split(' ')
+        .map((word) => word.charAt(0))
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    },
   },
 
   actions: {
@@ -40,6 +51,7 @@ export const useAuthStore = defineStore('auth', {
 
         this.token = res.data.token
         this.user = res.data.user
+        this.user.image = 'https://i.pravatar.cc/40'
         setToken(res.data.token)
 
         return {
@@ -59,6 +71,7 @@ export const useAuthStore = defineStore('auth', {
         const res = await api.get<User>('me')
 
         this.user = res.data
+        this.user.image = 'https://i.pravatar.cc/40'
 
         return {
           success: true,

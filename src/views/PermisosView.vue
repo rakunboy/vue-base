@@ -2,7 +2,7 @@
   <div class="p-4 w-100">
     <h2 class="mb-4">Permisos</h2>
 
-    <PermisosGrid />
+    <PermisosGrid :loadOnMounted="true" />
   </div>
 
 </template>

@@ -6,7 +6,10 @@
       <!-- Avatar -->
       <div class="col-md-4 d-flex justify-content-center">
         <div class="avatar-container text-center">
-          <img class="avatar" src="https://i.pravatar.cc/120" alt="avatar" />
+          <img class="avatar" v-if="authStore.user?.image" :src="authStore.user?.image" alt="avatar" />
+          <div v-else class="avatar avatar-initials">
+            {{ authStore.userInitials }}
+          </div>
           <h5 class="mt-3">{{ form.name }}</h5>
           <small class="text-secondary">{{ form.email }}</small>
         </div>
@@ -19,16 +22,16 @@
 
           <div class="mb-3">
             <label class="form-label">Nombre completo</label>
-            <input v-model="form.name" type="text" class="form-control dark-input" />
+            <input v-model="form.name" type="text" class="form-control dark-input" :disabled="true" />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Correo electrónico</label>
-            <input v-model="form.email" type="email" class="form-control dark-input" />
+            <input v-model="form.email" type="email" class="form-control dark-input" :disabled="true" />
           </div>
 
           <div class="d-flex justify-content-end">
-            <button class="btn btn-primary px-4" @click="saveProfile">Guardar cambios</button>
+            <button class="btn btn-primary px-4" @click="saveProfile" :disabled="true">Guardar cambios</button>
           </div>
         </div>
       </div>
@@ -37,12 +40,15 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/authStore'
 import { reactive } from 'vue'
+
+const authStore = useAuthStore()
 
 // DEMO: información del usuario (luego vendrá desde API)
 const form = reactive({
-  name: 'Admin User',
-  email: 'admin@example.com',
+  name: authStore.user?.name,
+  email: authStore.user?.email,
 })
 
 const saveProfile = () => {

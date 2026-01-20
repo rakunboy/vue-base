@@ -138,10 +138,6 @@ export const usePermisoStore = defineStore('permisos', {
           }
         }
 
-        // this.items[index] = {
-        //   ...this.items[index],
-        //   ...res.data.data,
-        // }
         this.items[index].has_permission_role = true
 
         return {
