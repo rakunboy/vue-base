@@ -1,23 +1,40 @@
 <template>
   <div>
     <!-- Sidebar -->
-    <aside :class="sidebarClasses">
+    <aside ref="sidebarRef" :class="sidebarClasses">
       <!-- Header -->
       <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
-        <h3 class="text-primary fw-bold mb-0">MiApp</h3>
+        <h3 class="text-primary fw-bold mb-0" v-show="!isCollapsed || isMobile">
+          MiApp
+        </h3>
+
+        <!-- Desktop collapse -->
+        <button
+          v-if="!isMobile"
+          class="btn btn-sm btn-outline-secondary"
+          @click="toggleCollapse"
+          aria-label="Colapsar menú"
+        >
+          <i class="bi" :class="isCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+        </button>
       </div>
 
-      <!-- Navigation -->
-      <nav class="nav flex-column gap-1 px-2" role="navigation">
-        <SidebarItem
-          v-for="item in menuStore.sidebarMenu"
-          :key="item.titulo"
-          :item="item"
-        />
-      </nav>
+      <!-- Scrollable content -->
+      <div class="sidebar-content">
+        <nav class="nav flex-column gap-1 px-2" role="navigation">
+          <SidebarItem
+            v-for="item in menuStore.sidebarMenu"
+            :key="item.titulo"
+            :item="item"
+            :is-collapsed="isCollapsed"
+            :is-mobile="isMobile"
+            @navigate="closeMobile"
+          />
+        </nav>
+      </div>
     </aside>
 
-    <!-- Botón hamburguesa (solo móvil) -->
+    <!-- Mobile hamburger -->
     <button
       v-if="isMobile && !isOpen"
       class="mobile-hamburger btn btn-primary"
@@ -27,7 +44,7 @@
       <i class="bi bi-list"></i>
     </button>
 
-    <!-- Overlay (solo móvil cuando está abierto) -->
+    <!-- Overlay -->
     <div
       v-if="isMobile && isOpen"
       class="sidebar-overlay"
@@ -37,11 +54,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { gsap } from 'gsap'
 import { useMenuStore } from '@/stores/menuStore'
 import SidebarItem from './SidebarItem.vue'
 
 const menuStore = useMenuStore()
+
+const sidebarRef = ref<HTMLElement | null>(null)
 
 const isMobile = ref(false)
 const isOpen = ref(false)
@@ -52,6 +72,7 @@ const STORAGE_KEY = 'sidebar-collapsed'
 /* ---------- Responsive ---------- */
 const handleResize = () => {
   isMobile.value = window.innerWidth < 768
+
   if (!isMobile.value) {
     isOpen.value = false
     isCollapsed.value = localStorage.getItem(STORAGE_KEY) === 'true'
@@ -59,33 +80,78 @@ const handleResize = () => {
 }
 
 /* ---------- Desktop ---------- */
-// const toggleCollapse = () => {
-//   isCollapsed.value = !isCollapsed.value
-//   localStorage.setItem(STORAGE_KEY, String(isCollapsed.value))
-// }
+const toggleCollapse = async () => {
+  isCollapsed.value = !isCollapsed.value
+  localStorage.setItem(STORAGE_KEY, String(isCollapsed.value))
+  await nextTick()
+  animateCollapse()
+}
 
 /* ---------- Mobile ---------- */
-const toggleMobile = () => {
+const toggleMobile = async () => {
   isOpen.value = !isOpen.value
+  await nextTick()
+  animateMobile()
 }
-const closeMobile = () => { isOpen.value = false }
+
+const closeMobile = async () => {
+  isOpen.value = false
+  await nextTick()
+  animateMobile()
+}
+
+/* ---------- Animations ---------- */
+const animateCollapse = () => {
+  if (!sidebarRef.value || isMobile.value) return
+
+  gsap.to(sidebarRef.value, {
+    width: isCollapsed.value ? 70 : 240,
+    duration: 0.25,
+    ease: 'power3.inOut',
+  })
+}
+
+const animateMobile = () => {
+  if (!sidebarRef.value || !isMobile.value) return
+
+  gsap.to(sidebarRef.value, {
+    x: isOpen.value ? 0 : '-100%',
+    duration: 0.3,
+    ease: 'power3.out',
+  })
+}
 
 /* ---------- Classes ---------- */
 const sidebarClasses = computed(() => ({
   sidebar: true,
-  'sidebar-expanded': !isCollapsed.value && !isMobile.value,
-  'sidebar-collapsed': isCollapsed.value && !isMobile.value,
   'sidebar-mobile': isMobile.value,
-  'sidebar-mobile-open': isMobile.value && isOpen.value,
 }))
 
 /* ---------- Lifecycle ---------- */
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
+
+  if (sidebarRef.value) {
+    gsap.set(sidebarRef.value, {
+      width: isMobile.value ? 240 : isCollapsed.value ? 70 : 240,
+      x: isMobile.value ? '-100%' : 0,
+    })
+  }
 })
+
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+})
+
+/* ---------- Sync on breakpoint ---------- */
+watch(isMobile, () => {
+  if (!sidebarRef.value) return
+
+  gsap.set(sidebarRef.value, {
+    width: isMobile.value ? 240 : isCollapsed.value ? 70 : 240,
+    x: isMobile.value ? '-100%' : 0,
+  })
 })
 </script>
 
@@ -93,38 +159,41 @@ onUnmounted(() => {
 .sidebar {
   background-color: #2a2c34;
   border-right: 1px solid #3a3c45;
-  min-height: 100vh;
-  transition: width 0.25s ease, transform 0.25s ease;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 240px; /* default */
 }
 
-.sidebar-expanded { width: 240px; }
-.sidebar-collapsed { width: 70px; }
-
+/* Mobile */
 .sidebar-mobile {
   position: fixed;
   top: 0;
   left: 0;
-  width: 240px;
-  transform: translateX(-100%);
   z-index: 1040;
 }
-.sidebar-mobile-open { transform: translateX(0); }
 
-.sidebar-header { border-bottom: 1px solid #3a3c45; }
-
-/* Links */
-.nav-link {
-  color: #aeb2b8;
-  padding: 10px 12px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
+/* Header */
+.sidebar-header {
+  border-bottom: 1px solid #3a3c45;
+  flex-shrink: 0;
 }
-.nav-link:hover { background-color: #3a3c45; color: var(--main-color); }
 
-/* Activo */
-:deep(.router-link-exact-active) {
+/* Scrollable content */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 1rem;
+}
+
+/* Scrollbar */
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-content::-webkit-scrollbar-thumb {
   background-color: #3a3c45;
-  color: #ffffff;
+  border-radius: 4px;
 }
 
 /* Overlay */
@@ -135,17 +204,12 @@ onUnmounted(() => {
   z-index: 1030;
 }
 
-/* Botón hamburguesa móvil */
+/* Mobile hamburger */
 .mobile-hamburger {
   position: fixed;
   top: 12px;
   left: 12px;
   z-index: 1050;
   border-radius: 8px;
-  padding: 6px 10px;
-}
-
-.sidebar-overflow {
-  overflow-y: auto;
 }
 </style>

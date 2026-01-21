@@ -6,7 +6,7 @@
     </h5>
 
     <div class="d-flex align-items-center gap-3">
-      <span class="user-role text-secondary small">Admin</span>
+      <span class="user-role text-secondary small">{{ authStore.user?.name }}</span>
 
       <!-- Configuración -->
       <DropDown icon="gear">

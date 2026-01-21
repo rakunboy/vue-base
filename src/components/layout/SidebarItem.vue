@@ -1,51 +1,72 @@
 <template>
-  <div>
+  <div class="sidebar-item">
     <!-- Item con children -->
     <div
       v-if="hasChildren"
       class="nav-link d-flex align-items-center gap-2 has-children"
       :class="{ open: isOpen }"
       @click="toggleChildren"
-      :data-bs-toggle="props.isCollapsed && !props.isMobile ? 'tooltip' : null"
+      :data-bs-toggle="isCollapsed && !isMobile ? 'tooltip' : null"
       data-bs-placement="right"
-      :title="props.isCollapsed && !props.isMobile ? props.item.titulo : ''"
+      :title="isCollapsed && !isMobile ? item.titulo : ''"
     >
-      <BootstrapIcon :icon="props.item.icon" size="20" />
-      <span v-if="!props.isCollapsed || props.isMobile">{{ props.item.titulo }}</span>
-      <i class="bi ms-auto" :class="isOpen ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+      <BootstrapIcon :icon="item.icon" size="20" />
+
+      <!-- TEXTO (NO v-if) -->
+      <span
+        ref="textRef"
+        class="item-text"
+        v-show="!isMobile"
+      >
+        {{ item.titulo }}
+      </span>
+
+      <i
+        ref="chevronRef"
+        class="bi ms-auto"
+        :class="isOpen ? 'bi-chevron-down' : 'bi-chevron-right'"
+      />
     </div>
 
-    <!-- Item sin children: navega -->
+    <!-- Item sin children -->
     <router-link
       v-else
-      :to="props.item.route"
+      :to="item.route"
       class="nav-link d-flex align-items-center gap-2"
-      :data-bs-toggle="props.isCollapsed && !props.isMobile ? 'tooltip' : null"
+      @click="emit('navigate')"
+      :data-bs-toggle="isCollapsed && !isMobile ? 'tooltip' : null"
       data-bs-placement="right"
-      :title="props.isCollapsed && !props.isMobile ? props.item.titulo : ''"
-      @click="onItemClick"
+      :title="isCollapsed && !isMobile ? item.titulo : ''"
     >
-      <BootstrapIcon :icon="props.item.icon" size="20" />
-      <span v-if="!props.isCollapsed || props.isMobile">{{ props.item.titulo }}</span>
+      <BootstrapIcon :icon="item.icon" size="20" />
+
+      <!-- TEXTO (NO v-if) -->
+      <span
+        ref="textRef"
+        class="item-text"
+        v-show="!isMobile"
+      >
+        {{ item.titulo }}
+      </span>
     </router-link>
 
-    <!-- Submenú -->
-    <transition name="submenu">
-      <div v-if="hasChildren && isOpen" class="submenu ps-3">
-        <SidebarItem
-          v-for="child in props.item.children"
-          :key="child.titulo"
-          :item="child"
-          :is-collapsed="props.isCollapsed ?? false"
-          :is-mobile="props.isMobile ?? false"
-        />
-      </div>
-    </transition>
+    <!-- Submenu -->
+    <div ref="submenuRef" v-show="hasChildren && isOpen" class="submenu ps-3">
+      <SidebarItem
+        v-for="child in item.children"
+        :key="child.titulo"
+        :item="child"
+        :is-collapsed="isCollapsed"
+        :is-mobile="isMobile"
+        @navigate="emit('navigate')"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
+import { gsap } from 'gsap'
 import BootstrapIcon from '../common/BootstrapIcon.vue'
 
 const props = defineProps<{
@@ -54,83 +75,124 @@ const props = defineProps<{
   isMobile?: boolean
 }>()
 
+const emit = defineEmits<{
+  (e: 'navigate'): void
+}>()
+
 const isOpen = ref(false)
+
+const textRef = ref<HTMLElement | null>(null)
+const chevronRef = ref<HTMLElement | null>(null)
+const submenuRef = ref<HTMLElement | null>(null)
+
 const hasChildren = computed(() => !!props.item.children?.length)
 
-function toggleChildren() {
-  if (hasChildren.value) isOpen.value = !isOpen.value
-}
+//
+// ─────────────────────────────────────────────
+// 🔥 GSAP: ANIMACIÓN REAL DE COLAPSO
+// ─────────────────────────────────────────────
+//
+watch(
+  () => props.isCollapsed,
+  async (collapsed) => {
+    await nextTick()
 
-function onItemClick() {
-  if (props.isMobile) {
-    // opcional: cerrar sidebar móvil
-  }
-  nextTick(() => {
-    // bootstrap tooltip update
-    if (props.isCollapsed && !props.isMobile) {
-      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-        new (window as any).bootstrap.Tooltip(el)
+    /* TEXTO */
+    if (textRef.value) {
+      gsap.to(textRef.value, {
+        opacity: collapsed ? 0 : 1,
+        width: collapsed ? 0 : 'auto',
+        x: collapsed ? -8 : 0,
+        duration: 0.25,
+        ease: 'power2.out',
       })
     }
-  })
+
+    /* CHEVRON */
+    if (chevronRef.value) {
+      gsap.to(chevronRef.value, {
+        opacity: collapsed ? 0 : 1,
+        duration: 0.15,
+      })
+    }
+
+    /* SUBMENÚ → cerrar si se colapsa */
+    if (collapsed && isOpen.value && submenuRef.value) {
+      gsap.to(submenuRef.value, {
+        height: 0,
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+        onComplete: () => (isOpen.value = false),
+      })
+    }
+  },
+  { immediate: true }
+)
+
+//
+// ─────────────────────────────────────────────
+// Submenús
+// ─────────────────────────────────────────────
+//
+const toggleChildren = async () => {
+  if (!hasChildren.value || props.isCollapsed) return
+
+  isOpen.value = !isOpen.value
+  await nextTick()
+
+  if (!submenuRef.value) return
+
+  if (isOpen.value) {
+    gsap.fromTo(
+      submenuRef.value,
+      { height: 0, opacity: 0 },
+      { height: 'auto', opacity: 1, duration: 0.25, ease: 'power2.out' }
+    )
+  } else {
+    gsap.to(submenuRef.value, {
+      height: 0,
+      opacity: 0,
+      duration: 0.2,
+      ease: 'power2.in',
+    })
+  }
 }
 </script>
 
 <style scoped>
-.nav-link.has-children, .nav-link {
+.sidebar-item {
+  width: 100%;
+}
+
+.nav-link {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
-  transition: background 0.2s ease, color 0.2s ease;
   background-color: transparent;
   color: #e5e5e5;
   text-decoration: none;
+  overflow: hidden;
 }
 
-/* Hover */
-.nav-link:hover {
-  background-color: #3a3c45;
-  color: #ffffff;
+.item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
 }
 
-/* Reset focus / active */
-.nav-link:focus,
-.nav-link:active {
-  color: #ffffff;
-  background-color: #3a3c45;
-  outline: none;
-  box-shadow: none;
+.has-children.open {
+  background-color: #343640;
 }
 
-/* Íconos y textos dentro de nav-link */
-.nav-link > span,
-.nav-link > i {
-  color: inherit;
-  transition: color 0.2s ease;
-}
-
-/* Submenú */
+/* Submenu */
 .submenu {
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding-left: 8px;
 }
-
-/* Animación submenú */
-.submenu-enter-active, .submenu-leave-active {
-  transition: all 0.2s ease;
-}
-.submenu-enter-from, .submenu-leave-to {
-  opacity: 0;
-  transform: translateY(-5px);
-}
-.submenu-enter-to, .submenu-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
 </style>
-
-
